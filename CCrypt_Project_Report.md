@@ -11,28 +11,18 @@
 A CLI C tool that lets you encrypt and decrypt files, optionally with compression or without.
 
 ### 2.2 Why is this program needed?
-- **Data Security**: In an increasingly digital world, protecting sensitive files from unauthorized access is crucial
-- **Privacy Protection**: Users need a simple way to secure personal documents, photos, and other sensitive data
-- **Compliance Requirements**: Many professionals need to encrypt files to meet regulatory requirements
-- **Portable Security**: A standalone CLI tool provides encryption capabilities without dependency on complex software suites
-- **Educational Value**: Demonstrates fundamental cryptographic concepts and file manipulation in C
+In a case of using a third party storage service, encrypting your files becomes crucial since your files are now open to third party / attackers who manage to get into their database. By encrypting your cloud files and only decrypting when needed, you're able to protect all of your cloud data even if the third party failed to secure it.
 
 ### 2.3 How would this program be used?
-- **Personal Use**: Encrypt sensitive documents before storing them on cloud services or external drives
-- **Professional Use**: Secure confidential business documents and client data
-- **Developer Use**: Protect source code and configuration files containing sensitive information
-- **Educational Use**: Learn about encryption, compression, and file management concepts
-- **Backup Security**: Encrypt files before creating backups to ensure data remains secure even if backup media is compromised
+This program will be used to encrypt cloud data that can be mounted on your computer as a virtual drive, etc google drive, one drive, what not.
 
 ### 2.4 Who is our target user?
 - **Primary Users**: 
-  - Computer science students learning about cryptography and file systems
-  - Software developers needing lightweight encryption tools
-  - Security-conscious individuals wanting to protect personal files
+  - Everday Joe
+  - Anyone who uses cloud storage
 - **Secondary Users**:
-  - IT professionals requiring simple encryption solutions
-  - Researchers handling sensitive data
-  - Anyone needing basic file encryption without complex software dependencies
+  - IT professionals
+  - Large cloud depended cooperations
 
 ## 3. Project Scope
 
