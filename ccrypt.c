@@ -152,28 +152,45 @@ void display_main_menu(void)
  * @brief Get and validate user input for menu selection
  * Author: [Your Name Here]
  */
+// ...existing code...
 int get_user_choice(const char *prompt, int min_value, int max_value)
 {
-    int choice;
-    int valid_input = 0;
-    
-    do {
+    char line[64];
+    long val;
+    char *endptr;
+
+    while (1) {
         printf("%s", prompt);
-        if (scanf("%d", &choice) == 1) {
-            if (choice >= min_value && choice <= max_value) {
-                valid_input = 1;
-            } else {
-                printf("Please enter a number between %d and %d\n", min_value, max_value);
-            }
-        } else {
-            printf("Invalid input. Please enter a number.\n");
-            /* Clear input buffer */
-            while (getchar() != '\n');
+        if (!fgets(line, sizeof(line), stdin)) {
+            /* input error - return a safe default */
+            return min_value;
         }
-    } while (!valid_input);
-    
-    return choice;
+
+        /* strip leading spaces */
+        char *p = line;
+        while (*p == ' ' || *p == '\t') p++;
+
+        val = strtol(p, &endptr, 10);
+        if (endptr == p) {
+            printf("Invalid input. Please enter a number.\n");
+            continue;
+        }
+
+        /* allow trailing newline or NUL only */
+        if (*endptr != '\n' && *endptr != '\0') {
+            printf("Invalid input. Please enter a number.\n");
+            continue;
+        }
+
+        if (val < min_value || val > max_value) {
+            printf("Please enter a number between %d and %d\n", min_value, max_value);
+            continue;
+        }
+
+        return (int)val;
+    }
 }
+// ...existing code...
 
 /**
  * @brief Process user menu selection and call appropriate function
@@ -320,16 +337,43 @@ int encrypt_file_workflow(encryption_library_t *library)
  */
 int get_file_path_from_user(char *file_path, size_t buffer_size)
 {
+    /* Prompt and read a line */
     printf("Enter the path to the file to encrypt: ");
-    fgets(file_path, buffer_size, stdin);
-    
-    /* Remove newline if present */
-    size_t len = strlen(file_path);
-    if (len > 0 && file_path[len-1] == '\n') {
-        file_path[len-1] = '\0';
+    if (!fgets(file_path, (int)buffer_size, stdin)) {
+        return ERROR_INVALID_PATH;
     }
-    
-    /* Validate path */
+
+    /* Remove trailing newline and CR characters */
+    size_t len = strlen(file_path);
+    while (len > 0 && (file_path[len - 1] == '\n' || file_path[len - 1] == '\r')) {
+        file_path[--len] = '\0';
+    }
+
+    /* Trim leading spaces/tabs */
+    char *start = file_path;
+    while (*start == ' ' || *start == '\t') start++;
+
+    /* Trim trailing spaces/tabs (start may have moved) */
+    char *end = start + strlen(start);
+    while (end > start && (*(end - 1) == ' ' || *(end - 1) == '\t')) {
+        *(--end) = '\0';
+    }
+
+    /* Remove surrounding double or single quotes if present */
+    if ((start[0] == '"' && end > start + 1 && end[-1] == '"') ||
+        (start[0] == '\'' && end > start + 1 && end[-1] == '\'')) {
+        start++;
+        end[-1] = '\0';
+    }
+
+    /* Move cleaned string back to file_path buffer if trimmed */
+    if (start != file_path) {
+        size_t moved = strlen(start) + 1;
+        if (moved > buffer_size) return ERROR_INVALID_PATH;
+        memmove(file_path, start, moved);
+    }
+
+    /* Validate path (fopen inside validate_file_path) */
     return validate_file_path(file_path);
 }
 
