@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.py": "python",
+        "time.h": "c",
+        "ccrypt.h": "c"
+    }
+}
