@@ -435,7 +435,7 @@ int encrypt_file(const char *input_path, const char *output_path,
 
 /**
  * @brief Apply compression algorithm to file data
- * Author: [Your Name Here]
+ * Author: [Gordon huang]
  */
 int compress_data(const unsigned char *input_data, long input_size,
                   unsigned char *output_data, long *output_size)
@@ -470,7 +470,7 @@ int decrypt_file_workflow(encryption_library_t *library)
 
 /**
  * @brief Load encryption library from disk
- * Author: [Your Name Here]
+ * Author: [Gordon Huang]
  */
 int load_encryption_library(encryption_library_t *library)
 {
