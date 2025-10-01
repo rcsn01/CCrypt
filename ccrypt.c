@@ -552,7 +552,7 @@ int validate_file_path(const char *file_path)
 
 /**
  * @brief Generate a secure filename for encrypted file
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int generate_encrypted_filename(const char *original_path, char *encrypted_filename, 
                                size_t buffer_size, unsigned long id)
@@ -591,4 +591,429 @@ int safe_string_copy(char *dest, const char *src, size_t dest_size)
     return SUCCESS;
 }
 
-/* Additional utility functions would be implemented here following the same pattern */
+/**
+ * @brief Decrypt an encrypted file (placeholder implementation)
+ * @param encrypted_path Path to the encrypted input file
+ * @param output_path Path where the decrypted output should be written
+ * @param password Password used for decryption
+ * @param method Encryption method used (encryption_method_t)
+ * @param metadata Optional pointer to file metadata associated with the file
+ * @return SUCCESS on success, or an error code on failure
+ * @author [Chu-Cheng Yu]
+ *
+ * NOTE: This is a stub. A full implementation should read the encrypted file,
+ * verify integrity (checksum), decrypt according to the chosen method,
+ * optionally decompress, and write the resulting plaintext to output_path.
+ */
+int decrypt_file(const char *encrypted_path, const char *output_path,
+                 const char *password, encryption_method_t method, const file_metadata_t *metadata)
+{
+    /* TODO: Implement full decryption: read file, decrypt, verify checksum, write output */
+    printf("[not implemented] Decrypting file: %s -> %s (method=%d)\n", encrypted_path, output_path, (int)method);
+    (void)password; (void)metadata;
+    return SUCCESS;
+}
+
+/**
+ * @brief Present library to user and select an entry for decryption (stub)
+ * @param library Pointer to the encryption library instance
+ * @param selected_index Out parameter to receive the selected index (0-based)
+ * @return SUCCESS if a selection was made, or ERROR_FILE_NOT_FOUND if library empty
+ * @author [Chu-Cheng Yu]
+ *
+ * TODO: Replace with interactive selection UI that lists entries and validates input.
+ */
+int select_file_for_decryption(encryption_library_t *library, int *selected_index)
+{
+    if (!library || library->count == 0) return ERROR_FILE_NOT_FOUND;
+    /* Default to first entry for the stub */
+    if (selected_index) *selected_index = 0;
+    return SUCCESS;
+}
+
+/**
+ * @brief Prompt user for a decryption password (non-hidden input)
+ * @param password Buffer to receive the password string
+ * @param buffer_size Size of the password buffer
+ * @return SUCCESS on success, or ERROR_INVALID_PASSWORD on failure
+ * @author [Chu-Cheng Yu]
+ *
+ * Note: This reads the password with fgets and does not hide input. For real
+ * applications, a platform-specific no-echo input should be used.
+ */
+int get_decryption_password(char *password, size_t buffer_size)
+{
+    if (!password || buffer_size == 0) return ERROR_INVALID_PASSWORD;
+    printf("Enter decryption password: ");
+    if (!fgets(password, (int)buffer_size, stdin)) return ERROR_INVALID_PASSWORD;
+    /* strip newline */
+    size_t len = strlen(password);
+    if (len > 0 && (password[len - 1] == '\n' || password[len - 1] == '\r')) password[len - 1] = '\0';
+    return SUCCESS;
+}
+
+/**
+ * @brief Decrypt a buffer of data using the supplied password (stub)
+ * @param encrypted_data Pointer to input encrypted bytes
+ * @param data_size Size of input buffer in bytes
+ * @param password Password used to derive the decryption key
+ * @param output_data Output buffer to receive decrypted bytes (must be allocated)
+ * @return SUCCESS on success, error code on invalid input
+ * @author [Chu-Cheng Yu]
+ *
+ * TODO: Implement algorithm-specific decryption (XOR, Caesar). This stub
+ * currently copies input to output (no decryption).
+ */
+int decrypt_data(const unsigned char *encrypted_data, long data_size,
+                 const char *password, unsigned char *output_data)
+{
+    /* TODO: Implement decrypt for supported methods (XOR/Caesar) */
+    (void)password;
+    if (!encrypted_data || data_size <= 0 || !output_data) return ERROR_INVALID_PATH;
+    /* simple passthrough stub */
+    for (long i = 0; i < data_size; ++i) output_data[i] = encrypted_data[i];
+    return SUCCESS;
+}
+
+/**
+ * @brief Decompress a buffer produced by compress_data (stub)
+ * @param compressed_data Pointer to compressed input bytes
+ * @param compressed_size Size of compressed input in bytes
+ * @param output_data Output buffer to receive decompressed bytes (must be allocated)
+ * @param output_size Out parameter to receive number of decompressed bytes
+ * @return SUCCESS on success, error code on invalid input
+ * @author [Chu-Cheng Yu]
+ *
+ * TODO: Implement decompression algorithm consistent with compress_data.
+ * Currently this stub performs a simple passthrough copy.
+ */
+int decompress_data(const unsigned char *compressed_data, long compressed_size,
+                    unsigned char *output_data, long *output_size)
+{
+    /* TODO: Implement decompression that matches compress_data (RLE or similar) */
+    if (!compressed_data || compressed_size <= 0 || !output_data || !output_size) return ERROR_INVALID_PATH;
+    /* passthrough */
+    memcpy(output_data, compressed_data, (size_t)compressed_size);
+    *output_size = compressed_size;
+    return SUCCESS;
+}
+
+/**
+ * @brief Remove a library entry at the specified index
+ * @param library Pointer to the encryption library
+ * @param index Index of entry to remove (0-based)
+ * @return SUCCESS on success, or error code for invalid parameters
+ * @author [Chu-Cheng Yu]
+ *
+ * Shifts subsequent entries down to keep the array compact and marks the
+ * library as modified for persistence.
+ */
+int remove_file_from_library(encryption_library_t *library, int index)
+{
+    if (!library) return ERROR_INVALID_PATH;
+    if (index < 0 || index >= library->count) return ERROR_INVALID_PATH;
+    /* Shift entries down to fill gap */
+    for (int i = index; i + 1 < library->count; ++i) {
+        library->entries[i] = library->entries[i + 1];
+    }
+    library->count--;
+    library->is_modified = 1;
+    return SUCCESS;
+}
+
+/**
+ * @brief Search the library for filenames containing a substring
+ * @param library Pointer to encryption library
+ * @param search_pattern Substring to search for
+ * @param results Array to receive matched indices
+ * @param max_results Maximum number of results to store in results array
+ * @return Number of matches found (may be 0)
+ * @author [Chu-Cheng Yu]
+ */
+int search_library_by_name(encryption_library_t *library, const char *search_pattern,
+                           int *results, int max_results)
+{
+    if (!library || !search_pattern || !results || max_results <= 0) return 0;
+    int found = 0;
+    for (int i = 0; i < library->count && found < max_results; ++i) {
+        if (strstr(library->entries[i].original_filename, search_pattern)) {
+            results[found++] = i;
+        }
+    }
+    return found;
+}
+
+/**
+ * @brief Delete an encrypted file from disk and remove it from the library
+ * @param library Pointer to the encryption library
+ * @param index Index of the entry to delete (0-based)
+ * @return SUCCESS on success, or error code on failure
+ * @author [Chu-Cheng Yu]
+ *
+ * Prompts for user confirmation, attempts to remove the file from the
+ * filesystem (best-effort), and removes the metadata entry from the library.
+ */
+int delete_encrypted_file(encryption_library_t *library, int index)
+{
+    if (!library) return ERROR_INVALID_PATH;
+    if (index < 0 || index >= library->count) return ERROR_INVALID_PATH;
+    /* Ask for confirmation */
+    char prompt[256];
+    snprintf(prompt, sizeof(prompt), "Delete '%s'? (y/n): ", library->entries[index].encrypted_filename);
+    if (!get_user_confirmation(prompt)) return SUCCESS; /* cancelled */
+    /* Remove file from filesystem */
+    if (remove(library->entries[index].encrypted_filename) != 0) {
+        /* best-effort: still remove library entry */
+        /* continue */
+    }
+    return remove_file_from_library(library, index);
+}
+
+/**
+ * @brief Rename an encrypted file on disk and update library metadata
+ * @param library Pointer to the encryption library
+ * @param index Index of the entry to rename (0-based)
+ * @param new_name New filename to apply
+ * @return SUCCESS on success, or an error code on failure
+ * @author [Chu-Cheng Yu]
+ */
+int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
+{
+    if (!library || !new_name) return ERROR_INVALID_PATH;
+    if (index < 0 || index >= library->count) return ERROR_INVALID_PATH;
+    /* Attempt to rename on filesystem */
+    if (rename(library->entries[index].encrypted_filename, new_name) != 0) {
+        return ERROR_PERMISSION_DENIED;
+    }
+    safe_string_copy(library->entries[index].encrypted_filename, new_name, sizeof(library->entries[index].encrypted_filename));
+    library->is_modified = 1;
+    return SUCCESS;
+}
+
+/**
+ * @brief Print detailed information about a library entry
+ * @param library Pointer to the encryption library
+ * @param index Index of the entry to display (0-based)
+ * @return void
+ * @author [Chu-Cheng Yu]
+ */
+void display_file_information(encryption_library_t *library, int index)
+{
+    if (!library) return;
+    if (index < 0 || index >= library->count) return;
+    file_metadata_t *m = &library->entries[index];
+    printf("File information for entry %d:\n", index + 1);
+    printf(" Original: %s\n", m->original_filename);
+    printf(" Encrypted: %s\n", m->encrypted_filename);
+    printf(" Original size: %ld\n", m->original_size);
+    printf(" Encrypted size: %ld\n", m->encrypted_size);
+    printf(" Compressed: %s\n", m->is_compressed ? "Yes" : "No");
+    printf(" Method: %d\n", m->encryption_method);
+}
+
+/**
+ * @brief Prompt user to confirm an operation (yes/no)
+ * @param operation_description Prompt string to display
+ * @return 1 if user confirms (y/Y), 0 otherwise
+ * @author [Chu-Cheng Yu]
+ */
+int get_user_confirmation(const char *operation_description)
+{
+    if (!operation_description) return 0;
+    printf("%s", operation_description);
+    char line[8];
+    if (!fgets(line, sizeof(line), stdin)) return 0;
+    return (line[0] == 'y' || line[0] == 'Y') ? 1 : 0;
+}
+
+/* Simple sort helpers: use qsort with wrappers */
+static int cmp_name(const void *a, const void *b)
+{
+    const file_metadata_t *x = (const file_metadata_t *)a;
+    const file_metadata_t *y = (const file_metadata_t *)b;
+    return strcasecmp(x->original_filename, y->original_filename);
+}
+
+static int cmp_date(const void *a, const void *b)
+{
+    const file_metadata_t *x = (const file_metadata_t *)a;
+    const file_metadata_t *y = (const file_metadata_t *)b;
+    if (x->encryption_id < y->encryption_id) return 1;
+    if (x->encryption_id > y->encryption_id) return -1;
+    return 0;
+}
+
+static int cmp_size(const void *a, const void *b)
+{
+    const file_metadata_t *x = (const file_metadata_t *)a;
+    const file_metadata_t *y = (const file_metadata_t *)b;
+    if (x->original_size < y->original_size) return 1;
+    if (x->original_size > y->original_size) return -1;
+    return 0;
+}
+
+static int cmp_type(const void *a, const void *b)
+{
+    const file_metadata_t *x = (const file_metadata_t *)a;
+    const file_metadata_t *y = (const file_metadata_t *)b;
+    return strcasecmp(x->file_type, y->file_type);
+}
+
+/**
+ * @brief Sort library entries alphabetically by original filename
+ * @param library Pointer to the encryption library
+ * @author [Chu-Cheng Yu]
+ */
+void sort_library_by_name(encryption_library_t *library)
+{
+    if (!library || library->count <= 1) return;
+    qsort(library->entries, (size_t)library->count, sizeof(file_metadata_t), cmp_name);
+}
+
+/**
+ * @brief Sort library entries by encryption id (most recent first)
+ * @param library Pointer to the encryption library
+ * @author [Chu-Cheng Yu]
+ */
+void sort_library_by_date(encryption_library_t *library)
+{
+    if (!library || library->count <= 1) return;
+    qsort(library->entries, (size_t)library->count, sizeof(file_metadata_t), cmp_date);
+}
+
+/**
+ * @brief Sort library entries by original file size (largest first)
+ * @param library Pointer to the encryption library
+ * @author [Chu-Cheng Yu]
+ */
+void sort_library_by_size(encryption_library_t *library)
+{
+    if (!library || library->count <= 1) return;
+    qsort(library->entries, (size_t)library->count, sizeof(file_metadata_t), cmp_size);
+}
+
+/**
+ * @brief Sort library entries by file type/extension
+ * @param library Pointer to the encryption library
+ * @author [Chu-Cheng Yu]
+ */
+void sort_library_by_type(encryption_library_t *library)
+{
+    if (!library || library->count <= 1) return;
+    qsort(library->entries, (size_t)library->count, sizeof(file_metadata_t), cmp_type);
+}
+
+/**
+ * @brief Compare two metadata entries according to a sort option
+ * @param a Pointer to first metadata entry
+ * @param b Pointer to second metadata entry
+ * @param sort_type Sorting criteria (see sort_option_t)
+ * @return negative/zero/positive as in strcmp-style comparators
+ * @author [Chu-Cheng Yu]
+ */
+int compare_metadata_entries(const file_metadata_t *a, const file_metadata_t *b, 
+                            sort_option_t sort_type)
+{
+    if (!a || !b) return 0;
+    switch (sort_type) {
+        case SORT_BY_NAME: return strcasecmp(a->original_filename, b->original_filename);
+        case SORT_BY_DATE: return (a->encryption_id < b->encryption_id) ? 1 : (a->encryption_id > b->encryption_id) ? -1 : 0;
+        case SORT_BY_SIZE: return (a->original_size < b->original_size) ? 1 : (a->original_size > b->original_size) ? -1 : 0;
+        case SORT_BY_TYPE: return strcasecmp(a->file_type, b->file_type);
+        default: return 0;
+    }
+}
+
+/**
+ * @brief Compute a simple non-cryptographic checksum for a file
+ * @param file_path Path to the file
+ * @param checksum Buffer to receive a textual hex checksum
+ * @param buffer_size Size of the checksum buffer
+ * @return SUCCESS on success, or an error code on failure
+ * @author [Chu-Cheng Yu]
+ *
+ * This is an ad-hoc checksum (sum of bytes). Do not use for security-critical
+ * integrity checks; replace with a real hash (SHA-256) when a crypto library
+ * is available.
+ */
+int calculate_file_checksum(const char *file_path, char *checksum, size_t buffer_size)
+{
+    if (!file_path || !checksum || buffer_size < 3) return ERROR_INVALID_PATH;
+    /* Simple non-cryptographic checksum: sum of bytes mod 65536 as hex */
+    FILE *f = fopen(file_path, "rb");
+    if (!f) return ERROR_FILE_NOT_FOUND;
+    unsigned long sum = 0;
+    int c;
+    while ((c = fgetc(f)) != EOF) sum = (sum + (unsigned char)c) & 0xFFFFFFFFu;
+    fclose(f);
+    snprintf(checksum, buffer_size, "%08lx", sum);
+    return SUCCESS;
+}
+
+/**
+ * @brief Extract the extension (without dot) from a filename
+ * @param filename Input filename string
+ * @param extension Buffer to receive the extension
+ * @param buffer_size Size of extension buffer
+ * @return SUCCESS if extension extracted, ERROR_INVALID_PATH otherwise
+ * @author [Chu-Cheng Yu]
+ */
+int get_file_extension(const char *filename, char *extension, size_t buffer_size)
+{
+    if (!filename || !extension || buffer_size == 0) return ERROR_INVALID_PATH;
+    const char *p = strrchr(filename, '.');
+    if (!p || *(p + 1) == '\0') {
+        extension[0] = '\0';
+        return ERROR_INVALID_PATH;
+    }
+    safe_string_copy(extension, p + 1, buffer_size);
+    return SUCCESS;
+}
+
+/**
+ * @brief Convert a raw byte size into a human readable string
+ * @param size File size in bytes
+ * @param buffer Buffer to receive formatted string
+ * @param buffer_size Size of the buffer
+ * @return void
+ * @author [Chu-Cheng Yu]
+ */
+void format_file_size(long size, char *buffer, size_t buffer_size)
+{
+    if (!buffer || buffer_size == 0) return;
+    const char *units[] = {"B", "KB", "MB", "GB"};
+    double s = (double)size;
+    int unit = 0;
+    while (s >= 1024.0 && unit < 3) { s /= 1024.0; unit++; }
+    snprintf(buffer, buffer_size, "%.2f %s", s, units[unit]);
+}
+
+/**
+ * @brief Derive a symmetric key from a password and optional salt (insecure)
+ * @param password Password string to derive from
+ * @param salt Optional salt string (may be NULL)
+ * @param key_buffer Buffer to receive derived key bytes
+ * @param key_length Number of bytes to derive
+ * @return SUCCESS on success, or ERROR_INVALID_PASSWORD on invalid inputs
+ * @author [Chu-Cheng Yu]
+ *
+ * This is a placeholder KDF and is NOT cryptographically secure. Replace
+ * with PBKDF2/Argon2 when a proper crypto library is available.
+ */
+int derive_encryption_key(const char *password, const char *salt,
+                         unsigned char *key_buffer, size_t key_length)
+{
+    if (!password || !key_buffer || key_length == 0) return ERROR_INVALID_PASSWORD;
+    /* Simple (insecure) KDF: repeat password bytes and salt mix - placeholder only */
+    size_t pwlen = strlen(password);
+    size_t saltlen = salt ? strlen(salt) : 0;
+    for (size_t i = 0; i < key_length; ++i) {
+        unsigned char v = 0;
+        if (pwlen) v ^= (unsigned char)password[i % pwlen];
+        if (saltlen) v ^= (unsigned char)salt[i % saltlen];
+        /* simple additional mixing */
+        v = (unsigned char)((v + (unsigned char)i) & 0xFF);
+        key_buffer[i] = v;
+    }
+    return SUCCESS;
+}
