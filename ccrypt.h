@@ -586,19 +586,4 @@ int safe_string_copy(char *dest, const char *src, size_t dest_size);
  * for display purposes.
  */
 void format_file_size(long size, char *buffer, size_t buffer_size);
-
-/**
- * @brief Derive encryption key from password using key strengthening
- * @param password Input password
- * @param salt Salt value for key derivation
- * @param key_buffer Buffer to store derived key
- * @param key_length Length of key to generate
- * @return SUCCESS on successful key derivation, error code on failure
- * 
- * Derives encryption key from password using salt and multiple iterations
- * to strengthen the key against brute force attacks.
- */
-int derive_encryption_key(const char *password, const char *salt,
-                         unsigned char *key_buffer, size_t key_length);
-
 #endif /* CCRYPT_H */

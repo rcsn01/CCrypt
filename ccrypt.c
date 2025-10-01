@@ -985,32 +985,3 @@ void format_file_size(long size, char *buffer, size_t buffer_size)
     snprintf(buffer, buffer_size, "%.2f %s", s, units[unit]);
 }
 
-/**
- * @brief Derive a symmetric key from a password and optional salt (insecure)
- * @param password Password string to derive from
- * @param salt Optional salt string (may be NULL)
- * @param key_buffer Buffer to receive derived key bytes
- * @param key_length Number of bytes to derive
- * @return SUCCESS on success, or ERROR_INVALID_PASSWORD on invalid inputs
- * @author [Chu-Cheng Yu]
- *
- * This is a placeholder KDF and is NOT cryptographically secure. Replace
- * with PBKDF2/Argon2 when a proper crypto library is available.
- */
-int derive_encryption_key(const char *password, const char *salt,
-                         unsigned char *key_buffer, size_t key_length)
-{
-    if (!password || !key_buffer || key_length == 0) return ERROR_INVALID_PASSWORD;
-    /* Simple (insecure) KDF: repeat password bytes and salt mix - placeholder only */
-    size_t pwlen = strlen(password);
-    size_t saltlen = salt ? strlen(salt) : 0;
-    for (size_t i = 0; i < key_length; ++i) {
-        unsigned char v = 0;
-        if (pwlen) v ^= (unsigned char)password[i % pwlen];
-        if (saltlen) v ^= (unsigned char)salt[i % saltlen];
-        /* simple additional mixing */
-        v = (unsigned char)((v + (unsigned char)i) & 0xFF);
-        key_buffer[i] = v;
-    }
-    return SUCCESS;
-}
