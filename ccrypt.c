@@ -477,13 +477,7 @@ int decrypt_file_workflow(encryption_library_t *library)
  */
 int load_encryption_library(encryption_library_t *library)
 {
-    FILE *file = fopen(LIBRARY_FILENAME, "rb");
-    if (!file) {
-        return ERROR_FILE_NOT_FOUND;
-    }
-    
     /* TODO: Implement library loading logic */
-    fclose(file);
     return SUCCESS;
 }
 
@@ -498,7 +492,7 @@ int save_encryption_library(encryption_library_t *library)
 
 /**
  * @brief Add new encrypted file entry to library
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int add_file_to_library(encryption_library_t *library, const file_metadata_t *metadata)
 {
@@ -515,7 +509,7 @@ int add_file_to_library(encryption_library_t *library, const file_metadata_t *me
 
 /**
  * @brief Display all files in the encryption library
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 void display_library_contents(encryption_library_t *library, sort_option_t sort_option)
 {
@@ -543,7 +537,6 @@ void display_library_contents(encryption_library_t *library, sort_option_t sort_
 
 /* ========================================================================
  * UTILITY FUNCTIONS
- * Author: [Your Name Here]
  * ======================================================================== */
 
 /**
@@ -575,7 +568,7 @@ int generate_encrypted_filename(const char *original_path, char *encrypted_filen
 
 /**
  * @brief Securely clear memory containing sensitive data
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 void secure_memory_clear(void *data, size_t size)
 {
@@ -587,7 +580,7 @@ void secure_memory_clear(void *data, size_t size)
 
 /**
  * @brief Safe string copy with bounds checking
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int safe_string_copy(char *dest, const char *src, size_t dest_size)
 {
