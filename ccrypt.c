@@ -25,7 +25,6 @@ static encryption_library_t g_library;
 
 /* ========================================================================
  * MAIN PROGRAM FUNCTIONS
- * Author: [Your Name Here]
  * ======================================================================== */
 
 /**
@@ -270,11 +269,11 @@ void display_error(int error_code, const char *context)
 
 /* ========================================================================
  * FILE ENCRYPTION FUNCTIONS
- * Author: [Chu-Cheng Yu]
  * ======================================================================== */
 
 /**
  * @brief Complete workflow for encrypting a user-specified file
+ * Author: [Chu-Cheng Yu]
  */
 int encrypt_file_workflow(encryption_library_t *library)
 {
@@ -429,7 +428,6 @@ int encrypt_file(const char *input_path, const char *output_path,
 
 /* ========================================================================
  * ADDITIONAL FUNCTION STUBS
- * Author: [Your Name Here]
  * ======================================================================== */
 
 /* Note: Due to length constraints, I'm including key function stubs.
