@@ -51,6 +51,13 @@ typedef enum {
     SORT_BY_TYPE = 4
 } sort_option_t;
 
+    /* Encryption methods supported */
+    typedef enum {
+        ENC_AES = 1,
+        ENC_XOR = 2,
+        ENC_CAESAR = 3
+    } encryption_method_t;
+
 /* ========================================================================
  * DATA STRUCTURES
  * ======================================================================== */
@@ -66,6 +73,7 @@ typedef struct {
     long original_size;
     long encrypted_size;
     unsigned long encryption_id;
+    int encryption_method; /* encryption_method_t value used for this file */
     int is_compressed;
     char file_type[10];
     char checksum[33]; /* MD5-style checksum for integrity */
@@ -220,7 +228,7 @@ int ask_compression_preference(void);
  */
 int encrypt_file(const char *input_path, const char *output_path, 
                  const char *password, int use_compression, 
-                 file_metadata_t *metadata);
+                encryption_method_t method, file_metadata_t *metadata);
 
 /**
  * @brief Apply compression algorithm to file data
@@ -298,7 +306,7 @@ int get_decryption_password(char *password, size_t buffer_size);
  * decryption, and optional decompression based on metadata.
  */
 int decrypt_file(const char *encrypted_path, const char *output_path,
-                 const char *password, const file_metadata_t *metadata);
+                 const char *password, encryption_method_t method, const file_metadata_t *metadata);
 
 /**
  * @brief Apply decryption cipher to encrypted data

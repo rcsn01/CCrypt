@@ -31,6 +31,7 @@ static encryption_library_t g_library;
 
 /**
  * @brief Main entry point for the CCrypt program
+ * Author: [Chu-Cheng Yu]
  */
 int main(int argc, char *argv[])
 {
@@ -190,7 +191,6 @@ int get_user_choice(const char *prompt, int min_value, int max_value)
         return (int)val;
     }
 }
-// ...existing code...
 
 /**
  * @brief Process user menu selection and call appropriate function
@@ -286,12 +286,21 @@ int encrypt_file_workflow(encryption_library_t *library)
     file_metadata_t metadata;
     int use_compression;
     int result;
+    encryption_method_t method;
     
     /* Get file path from user */
     result = get_file_path_from_user(file_path, sizeof(file_path));
     if (result != SUCCESS) {
         return result;
     }
+
+    /* Ask user for encryption method */
+    printf("Choose encryption method:\n");
+    printf(" 1) AES (placeholder - not implemented)\n");
+    printf(" 2) XOR (placeholder - not implemented)\n");
+    printf(" 3) Caesar shift (placeholder - not implemented)\n");
+    result = get_user_choice("Encryption method (1-3): ", 1, 3);
+    method = (encryption_method_t)result;
     
     /* Ask about compression */
     use_compression = ask_compression_preference();
@@ -302,7 +311,14 @@ int encrypt_file_workflow(encryption_library_t *library)
     /* Get password */
     printf("Enter encryption password: ");
     /* TODO: Implement hidden password input */
-    scanf("%s", password);
+    if (!fgets(password, sizeof(password), stdin)) {
+        return ERROR_INVALID_PASSWORD;
+    }
+    /* strip newline */
+    size_t pwlen = strlen(password);
+    if (pwlen > 0 && (password[pwlen - 1] == '\n' || password[pwlen - 1] == '\r')) {
+        password[pwlen - 1] = '\0';
+    }
     
     /* Generate encrypted filename using library next_id */
     result = generate_encrypted_filename(file_path, encrypted_filename, sizeof(encrypted_filename), library->next_id);
@@ -311,7 +327,7 @@ int encrypt_file_workflow(encryption_library_t *library)
     }
     
     /* Perform encryption */
-    result = encrypt_file(file_path, encrypted_filename, password, use_compression, &metadata);
+    result = encrypt_file(file_path, encrypted_filename, password, use_compression, method, &metadata);
     if (result != SUCCESS) {
         return result;
     }
@@ -383,12 +399,8 @@ int get_file_path_from_user(char *file_path, size_t buffer_size)
  */
 int ask_compression_preference(void)
 {
-    char choice;
-    
-    printf("Do you want to compress the file before encryption? (y/n): ");
-    scanf(" %c", &choice);
-    
-    return (choice == 'y' || choice == 'Y') ? 1 : 0;
+    int choice = get_user_choice("Compress before encryption? 1=Yes 2=No: ", 1, 2);
+    return (choice == 1) ? 1 : 0;
 }
 
 /**
@@ -397,6 +409,7 @@ int ask_compression_preference(void)
  */
 int encrypt_file(const char *input_path, const char *output_path, 
                  const char *password, int use_compression, 
+                 encryption_method_t method,
                  file_metadata_t *metadata)
 {
     /* TODO: Implement file encryption logic */
@@ -408,6 +421,8 @@ int encrypt_file(const char *input_path, const char *output_path,
     safe_string_copy(metadata->original_filename, input_path, sizeof(metadata->original_filename));
     safe_string_copy(metadata->encrypted_filename, output_path, sizeof(metadata->encrypted_filename));
     metadata->is_compressed = use_compression;
+    /* Record chosen encryption method */
+    metadata->encryption_method = (int)method;
     /* Assign a unique encryption id (set by caller) */
     /* metadata->encryption_id should already be set by caller */
     
@@ -430,9 +445,7 @@ int compress_data(const unsigned char *input_data, long input_size,
                   unsigned char *output_data, long *output_size)
 {
     /* TODO: Implement simple compression algorithm */
-    /* For now, just copy data (no compression) */
-    memcpy(output_data, input_data, input_size);
-    *output_size = input_size;
+
     return SUCCESS;
 }
 
@@ -445,10 +458,6 @@ int encrypt_data(const unsigned char *input_data, long data_size,
 {
     /* TODO: Implement XOR-based encryption with key derivation */
     /* Simple XOR placeholder - replace with proper implementation */
-    unsigned char key = (unsigned char)(strlen(password) % 256);
-    for (long i = 0; i < data_size; i++) {
-        output_data[i] = input_data[i] ^ key;
-    }
     return SUCCESS;
 }
 
@@ -485,14 +494,6 @@ int load_encryption_library(encryption_library_t *library)
  */
 int save_encryption_library(encryption_library_t *library)
 {
-    FILE *file = fopen(LIBRARY_FILENAME, "wb");
-    if (!file) {
-        return ERROR_PERMISSION_DENIED;
-    }
-    
-    /* TODO: Implement library saving logic */
-    fclose(file);
-    library->is_modified = 0;
     return SUCCESS;
 }
 
@@ -548,7 +549,7 @@ void display_library_contents(encryption_library_t *library, sort_option_t sort_
 
 /**
  * @brief Validate that a file path exists and is accessible
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int validate_file_path(const char *file_path)
 {
