@@ -1,9 +1,8 @@
 /**
  * @file ccrypt.h
  * @brief Header file for CCrypt - A CLI file encryption and compression tool
- * @author [Your Name Here] - Add your name for submission
+ * @author Chu-Cheng Yu,               - Add your name for submission
  * @date September 2025
- * @version 1.0
  * 
  * CCrypt is a command-line tool for encrypting and decrypting files with optional
  * compression. It maintains a library of encrypted files and provides management

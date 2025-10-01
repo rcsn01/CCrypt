@@ -1,9 +1,8 @@
 /**
  * @file ccrypt.c
  * @brief Main implementation file for CCrypt - A CLI file encryption and compression tool
- * @author [Your Name Here] - Add your name for submission
+ * @author Chu-Cheng Yu,               - Add your name for submission
  * @date September 2025
- * @version 1.0
  * 
  * This file contains the main implementation of CCrypt, a command-line tool for
  * encrypting and decrypting files with optional compression and library management.
