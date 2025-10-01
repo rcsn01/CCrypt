@@ -29,7 +29,7 @@ static encryption_library_t g_library;
 
 /**
  * @brief Main entry point for the CCrypt program
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int main(int argc, char *argv[])
 {
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
 /**
  * @brief Initialize program components and load encryption library
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int initialize_program(encryption_library_t *library)
 {
@@ -81,7 +81,7 @@ int initialize_program(encryption_library_t *library)
 
 /**
  * @brief Main program loop displaying menu and processing user commands
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int main_menu_loop(encryption_library_t *library)
 {
@@ -107,7 +107,7 @@ int main_menu_loop(encryption_library_t *library)
 
 /**
  * @brief Clean up program resources and save library before exit
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int cleanup_program(encryption_library_t *library)
 {
@@ -132,6 +132,7 @@ int cleanup_program(encryption_library_t *library)
 
 /**
  * @brief Display the main menu options to the user
+ * @author [Chu-Cheng Yu]
  */
 void display_main_menu(void)
 {
@@ -149,7 +150,7 @@ void display_main_menu(void)
 
 /**
  * @brief Get and validate user input for menu selection
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int get_user_choice(const char *prompt, int min_value, int max_value)
 {
@@ -191,7 +192,7 @@ int get_user_choice(const char *prompt, int min_value, int max_value)
 
 /**
  * @brief Process user menu selection and call appropriate function
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int process_user_command(int choice, encryption_library_t *library)
 {
@@ -230,7 +231,7 @@ int process_user_command(int choice, encryption_library_t *library)
 
 /**
  * @brief Display error message to user with context
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 void display_error(int error_code, const char *context)
 {
@@ -273,7 +274,7 @@ void display_error(int error_code, const char *context)
 
 /**
  * @brief Complete workflow for encrypting a user-specified file
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int encrypt_file_workflow(encryption_library_t *library)
 {
@@ -346,7 +347,7 @@ int encrypt_file_workflow(encryption_library_t *library)
 
 /**
  * @brief Get and validate file path from user input
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int get_file_path_from_user(char *file_path, size_t buffer_size)
 {
@@ -392,7 +393,7 @@ int get_file_path_from_user(char *file_path, size_t buffer_size)
 
 /**
  * @brief Ask user whether to compress file before encryption
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int ask_compression_preference(void)
 {
@@ -402,7 +403,7 @@ int ask_compression_preference(void)
 
 /**
  * @brief Encrypt a file with optional compression
- * Author: [Your Name Here]
+ * @author [Your Name Here]
  */
 int encrypt_file(const char *input_path, const char *output_path, 
                  const char *password, int use_compression, 
@@ -435,7 +436,7 @@ int encrypt_file(const char *input_path, const char *output_path,
 
 /**
  * @brief Apply compression algorithm to file data
- * Author: [Gordon huang]
+ * @author [Gordon Huang]
  */
 int compress_data(const unsigned char *input_data, long input_size,
                   unsigned char *output_data, long *output_size)
@@ -447,7 +448,7 @@ int compress_data(const unsigned char *input_data, long input_size,
 
 /**
  * @brief Apply encryption cipher to file data
- * Author: [Your Name Here]
+ * @author [Your Name Here]
  */
 int encrypt_data(const unsigned char *input_data, long data_size,
                  const char *password, unsigned char *output_data)
@@ -459,7 +460,7 @@ int encrypt_data(const unsigned char *input_data, long data_size,
 
 /**
  * @brief Complete workflow for decrypting a file from the library
- * Author: [Your Name Here]
+ * @author [Your Name Here]
  */
 int decrypt_file_workflow(encryption_library_t *library)
 {
@@ -470,7 +471,7 @@ int decrypt_file_workflow(encryption_library_t *library)
 
 /**
  * @brief Load encryption library from disk
- * Author: [Gordon Huang]
+ * @author [Gordon Huang]
  */
 int load_encryption_library(encryption_library_t *library)
 {
@@ -480,7 +481,7 @@ int load_encryption_library(encryption_library_t *library)
 
 /**
  * @brief Save encryption library to disk
- * Author: [Your Name Here]
+ * @author [Your Name Here]
  */
 int save_encryption_library(encryption_library_t *library)
 {
@@ -489,7 +490,7 @@ int save_encryption_library(encryption_library_t *library)
 
 /**
  * @brief Add new encrypted file entry to library
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int add_file_to_library(encryption_library_t *library, const file_metadata_t *metadata)
 {
@@ -506,7 +507,7 @@ int add_file_to_library(encryption_library_t *library, const file_metadata_t *me
 
 /**
  * @brief Display all files in the encryption library
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 void display_library_contents(encryption_library_t *library, sort_option_t sort_option)
 {
@@ -538,7 +539,7 @@ void display_library_contents(encryption_library_t *library, sort_option_t sort_
 
 /**
  * @brief Validate that a file path exists and is accessible
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int validate_file_path(const char *file_path)
 {
@@ -552,7 +553,7 @@ int validate_file_path(const char *file_path)
 
 /**
  * @brief Generate a secure filename for encrypted file
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int generate_encrypted_filename(const char *original_path, char *encrypted_filename, 
                                size_t buffer_size, unsigned long id)
@@ -565,7 +566,7 @@ int generate_encrypted_filename(const char *original_path, char *encrypted_filen
 
 /**
  * @brief Securely clear memory containing sensitive data
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 void secure_memory_clear(void *data, size_t size)
 {
@@ -577,7 +578,7 @@ void secure_memory_clear(void *data, size_t size)
 
 /**
  * @brief Safe string copy with bounds checking
- * Author: [Chu-Cheng Yu]
+ * @author [Chu-Cheng Yu]
  */
 int safe_string_copy(char *dest, const char *src, size_t dest_size)
 {
@@ -599,7 +600,7 @@ int safe_string_copy(char *dest, const char *src, size_t dest_size)
  * @param method Encryption method used (encryption_method_t)
  * @param metadata Optional pointer to file metadata associated with the file
  * @return SUCCESS on success, or an error code on failure
- * @author [Chu-Cheng Yu]
+ * @author [Empty]
  *
  * NOTE: This is a stub. A full implementation should read the encrypted file,
  * verify integrity (checksum), decrypt according to the chosen method,
@@ -619,7 +620,7 @@ int decrypt_file(const char *encrypted_path, const char *output_path,
  * @param library Pointer to the encryption library instance
  * @param selected_index Out parameter to receive the selected index (0-based)
  * @return SUCCESS if a selection was made, or ERROR_FILE_NOT_FOUND if library empty
- * @author [Chu-Cheng Yu]
+ * @author [Empty]
  *
  * TODO: Replace with interactive selection UI that lists entries and validates input.
  */
@@ -636,7 +637,7 @@ int select_file_for_decryption(encryption_library_t *library, int *selected_inde
  * @param password Buffer to receive the password string
  * @param buffer_size Size of the password buffer
  * @return SUCCESS on success, or ERROR_INVALID_PASSWORD on failure
- * @author [Chu-Cheng Yu]
+ * @author [Empty]
  *
  * Note: This reads the password with fgets and does not hide input. For real
  * applications, a platform-specific no-echo input should be used.
@@ -659,7 +660,7 @@ int get_decryption_password(char *password, size_t buffer_size)
  * @param password Password used to derive the decryption key
  * @param output_data Output buffer to receive decrypted bytes (must be allocated)
  * @return SUCCESS on success, error code on invalid input
- * @author [Chu-Cheng Yu]
+ * @author [Empty]
  *
  * TODO: Implement algorithm-specific decryption (XOR, Caesar). This stub
  * currently copies input to output (no decryption).
@@ -682,7 +683,7 @@ int decrypt_data(const unsigned char *encrypted_data, long data_size,
  * @param output_data Output buffer to receive decompressed bytes (must be allocated)
  * @param output_size Out parameter to receive number of decompressed bytes
  * @return SUCCESS on success, error code on invalid input
- * @author [Chu-Cheng Yu]
+ * @author [Empty]
  *
  * TODO: Implement decompression algorithm consistent with compress_data.
  * Currently this stub performs a simple passthrough copy.
@@ -703,7 +704,7 @@ int decompress_data(const unsigned char *compressed_data, long compressed_size,
  * @param library Pointer to the encryption library
  * @param index Index of entry to remove (0-based)
  * @return SUCCESS on success, or error code for invalid parameters
- * @author [Chu-Cheng Yu]
+ * @author [Empty]
  *
  * Shifts subsequent entries down to keep the array compact and marks the
  * library as modified for persistence.
@@ -728,7 +729,7 @@ int remove_file_from_library(encryption_library_t *library, int index)
  * @param results Array to receive matched indices
  * @param max_results Maximum number of results to store in results array
  * @return Number of matches found (may be 0)
- * @author [Chu-Cheng Yu]
+ * @author [Empty]
  */
 int search_library_by_name(encryption_library_t *library, const char *search_pattern,
                            int *results, int max_results)
@@ -748,7 +749,7 @@ int search_library_by_name(encryption_library_t *library, const char *search_pat
  * @param library Pointer to the encryption library
  * @param index Index of the entry to delete (0-based)
  * @return SUCCESS on success, or error code on failure
- * @author [Chu-Cheng Yu]
+ * @author [Empty]
  *
  * Prompts for user confirmation, attempts to remove the file from the
  * filesystem (best-effort), and removes the metadata entry from the library.
@@ -931,10 +932,6 @@ int compare_metadata_entries(const file_metadata_t *a, const file_metadata_t *b,
  * @param buffer_size Size of the checksum buffer
  * @return SUCCESS on success, or an error code on failure
  * @author [Chu-Cheng Yu]
- *
- * This is an ad-hoc checksum (sum of bytes). Do not use for security-critical
- * integrity checks; replace with a real hash (SHA-256) when a crypto library
- * is available.
  */
 int calculate_file_checksum(const char *file_path, char *checksum, size_t buffer_size)
 {
