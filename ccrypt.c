@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
 /**
  * @brief Initialize program components and load encryption library
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int initialize_program(encryption_library_t *library)
 {
@@ -83,7 +83,7 @@ int initialize_program(encryption_library_t *library)
 
 /**
  * @brief Main program loop displaying menu and processing user commands
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int main_menu_loop(encryption_library_t *library)
 {
@@ -109,7 +109,7 @@ int main_menu_loop(encryption_library_t *library)
 
 /**
  * @brief Clean up program resources and save library before exit
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int cleanup_program(encryption_library_t *library)
 {
@@ -129,7 +129,7 @@ int cleanup_program(encryption_library_t *library)
 
 /* ========================================================================
  * USER INTERFACE FUNCTIONS
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  * ======================================================================== */
 
 /**
@@ -151,9 +151,8 @@ void display_main_menu(void)
 
 /**
  * @brief Get and validate user input for menu selection
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
-// ...existing code...
 int get_user_choice(const char *prompt, int min_value, int max_value)
 {
     char line[64];
@@ -194,7 +193,7 @@ int get_user_choice(const char *prompt, int min_value, int max_value)
 
 /**
  * @brief Process user menu selection and call appropriate function
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int process_user_command(int choice, encryption_library_t *library)
 {
@@ -233,7 +232,7 @@ int process_user_command(int choice, encryption_library_t *library)
 
 /**
  * @brief Display error message to user with context
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 void display_error(int error_code, const char *context)
 {
@@ -272,7 +271,7 @@ void display_error(int error_code, const char *context)
 
 /* ========================================================================
  * FILE ENCRYPTION FUNCTIONS
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  * ======================================================================== */
 
 /**
@@ -349,7 +348,7 @@ int encrypt_file_workflow(encryption_library_t *library)
 
 /**
  * @brief Get and validate file path from user input
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int get_file_path_from_user(char *file_path, size_t buffer_size)
 {
@@ -395,7 +394,7 @@ int get_file_path_from_user(char *file_path, size_t buffer_size)
 
 /**
  * @brief Ask user whether to compress file before encryption
- * Author: [Your Name Here]
+ * Author: [Chu-Cheng Yu]
  */
 int ask_compression_preference(void)
 {
