@@ -2,6 +2,7 @@
     "files.associations": {
         "*.py": "python",
         "time.h": "c",
-        "ccrypt.h": "c"
+        "ccrypt.h": "c",
+        "library.h": "c"
     }
 }

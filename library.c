@@ -58,7 +58,7 @@ int add_file_to_library(encryption_library_t *library, const file_metadata_t *me
  * @param library Pointer to the encryption library
  * @param index Index of entry to remove (0-based)
  * @return SUCCESS on success, or error code for invalid parameters
- * @author [Empty]
+ * @author [Chu-Cheng Yu]
  */
 int remove_file_from_library(encryption_library_t *library, int index)
 {
@@ -143,7 +143,7 @@ void display_file_information(encryption_library_t *library, int index)
  * @param results Array to receive matched indices
  * @param max_results Maximum number of results to store in results array
  * @return Number of matches found (may be 0)
- * @author [Empty]
+ * @author [Chu-Cheng Yu]
  */
 int search_library_by_name(encryption_library_t *library, const char *search_pattern,
                            int *results, int max_results)
@@ -163,7 +163,7 @@ int search_library_by_name(encryption_library_t *library, const char *search_pat
  * @param library Pointer to the encryption library
  * @param index Index of the entry to delete (0-based)
  * @return SUCCESS on success, or error code on failure
- * @author [Empty]
+ * @author [Chu-Cheng Yu]
  */
 int delete_encrypted_file(encryption_library_t *library, int index)
 {
