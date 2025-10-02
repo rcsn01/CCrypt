@@ -163,7 +163,7 @@ int search_library_by_name(encryption_library_t *library, const char *search_pat
  * @param library Pointer to the encryption library
  * @param index Index of the entry to delete (0-based)
  * @return SUCCESS on success, or error code on failure
- * @author [Chu-Cheng Yu]
+ * @author [Haoyang Che]
  */
 int delete_encrypted_file(encryption_library_t *library, int index)
 {
@@ -187,7 +187,7 @@ int delete_encrypted_file(encryption_library_t *library, int index)
  * @param index Index of the entry to rename (0-based)
  * @param new_name New filename to apply
  * @return SUCCESS on success, or an error code on failure
- * @author [Chu-Cheng Yu]
+ * @author [Haoyang Che]
  */
 int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
 {
