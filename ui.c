@@ -1,9 +1,8 @@
-/**
- * @file ui.c
- * @brief User interface functions for CCrypt
- * @author Chu-Cheng Yu
- * @date September 2025
- * 
+/*
+ * ui.c
+ * User interface functions for CCrypt
+ * Chu-Cheng Yu
+ * September 2025
  * This file contains all user interface related functions including menu display,
  * user input handling, and command processing.
  */
@@ -18,9 +17,9 @@
  * USER INTERFACE FUNCTIONS
  * ======================================================================== */
 
-/**
- * @brief Display the main menu options to the user
- * @author [Chu-Cheng Yu]
+/*
+ * Display the main menu options to the user
+ * [Chu-Cheng Yu]
  */
 void display_main_menu(void)
 {
@@ -36,9 +35,9 @@ void display_main_menu(void)
     printf("========================================\n");
 }
 
-/**
- * @brief Get and validate user input for menu selection
- * @author [Chu-Cheng Yu]
+/*
+ * Get and validate user input for menu selection
+ * [Chu-Cheng Yu]
  */
 int get_user_choice(const char *prompt, int min_value, int max_value)
 {
@@ -78,9 +77,9 @@ int get_user_choice(const char *prompt, int min_value, int max_value)
     }
 }
 
-/**
- * @brief Main program loop displaying menu and processing user commands
- * @author [Chu-Cheng Yu]
+/*
+ * Main program loop displaying menu and processing user commands
+ * [Chu-Cheng Yu]
  */
 int main_menu_loop(encryption_library_t *library)
 {
@@ -104,9 +103,9 @@ int main_menu_loop(encryption_library_t *library)
     return result;
 }
 
-/**
- * @brief Process user menu selection and call appropriate function
- * @author [Chu-Cheng Yu]
+/*
+ * Process user menu selection and call appropriate function
+ * [Chu-Cheng Yu]
  */
 int process_user_command(int choice, encryption_library_t *library)
 {
@@ -142,9 +141,9 @@ int process_user_command(int choice, encryption_library_t *library)
     return result;
 }
 
-/**
- * @brief Display error message to user with context
- * @author [Chu-Cheng Yu]
+/*
+ * Display error message to user with context
+ * [Chu-Cheng Yu]
  */
 void display_error(int error_code, const char *context)
 {
@@ -181,9 +180,9 @@ void display_error(int error_code, const char *context)
     }
 }
 
-/**
- * @brief Get and validate file path from user input
- * @author [Chu-Cheng Yu]
+/*
+ * Get and validate file path from user input
+ * [Chu-Cheng Yu]
  */
 int get_file_path_from_user(char *file_path, size_t buffer_size)
 {
@@ -227,21 +226,20 @@ int get_file_path_from_user(char *file_path, size_t buffer_size)
     return validate_file_path(file_path);
 }
 
-/**
- * @brief Ask user whether to compress file before encryption
- * @author [Chu-Cheng Yu]
+/*
+ * Ask user whether to compress file before encryption
+ * [Chu-Cheng Yu]
  */
 int ask_compression_preference(void)
 {
-    int choice = get_user_choice("Compress before encryption? 1=Yes 2=No: ", 1, 2);
-    return (choice == 1) ? 1 : 0;
+    return get_user_confirmation("Compress before encryption? (y/n): ");
 }
 
-/**
- * @brief Prompt user to confirm an operation (yes/no)
- * @param operation_description Prompt string to display
- * @return 1 if user confirms (y/Y), 0 otherwise
- * @author [Chu-Cheng Yu]
+/*
+ * Prompt user to confirm an operation (yes/no)
+ * operation_description Prompt string to display
+ * 1 if user confirms (y/Y), 0 otherwise
+ * [Chu-Cheng Yu]
  */
 int get_user_confirmation(const char *operation_description)
 {
@@ -252,12 +250,12 @@ int get_user_confirmation(const char *operation_description)
     return (line[0] == 'y' || line[0] == 'Y') ? 1 : 0;
 }
 
-/**
- * @brief Prompt user for a decryption password (non-hidden input)
- * @param password Buffer to receive the password string
- * @param buffer_size Size of the password buffer
- * @return SUCCESS on success, or ERROR_INVALID_PASSWORD on failure
- * @author [Gordon Huang]
+/*
+ * Prompt user for a decryption password (non-hidden input)
+ * password Buffer to receive the password string
+ * buffer_size Size of the password buffer
+ * SUCCESS on success, or ERROR_INVALID_PASSWORD on failure
+ * [Gordon Huang]
  */
 int get_decryption_password(char *password, size_t buffer_size)
 {
@@ -270,11 +268,11 @@ int get_decryption_password(char *password, size_t buffer_size)
     return SUCCESS;
 }
 
-/**
- * @brief Display and handle file management submenu
- * @param library Pointer to the encryption library
- * @return SUCCESS on normal operation, error code on failure
- * @author [Chu-Cheng Yu]
+/*
+ * Display and handle file management submenu
+ * library Pointer to the encryption library
+ * SUCCESS on normal operation, error code on failure
+ * [Chu-Cheng Yu]
  */
 int file_management_menu(encryption_library_t *library)
 {
@@ -301,12 +299,12 @@ int file_management_menu(encryption_library_t *library)
         
         switch (choice) {
             case 1: // View file details
-                if (library->count == 0) {
+                if (get_library_count(library) == 0) {
                     printf("No files in library.\n");
                     break;
                 }
                 display_library_contents(library, SORT_BY_NAME);
-                file_index = get_user_choice("Enter file number to view details (0 to cancel): ", 0, library->count);
+                file_index = get_user_choice("Enter file number to view details (0 to cancel): ", 0, get_library_count(library));
                 if (file_index > 0) {
                     display_file_information(library, file_index - 1);
                 }
@@ -325,9 +323,10 @@ int file_management_menu(encryption_library_t *library)
                     if (num_results > 0) {
                         printf("Found %d matching files:\n", num_results);
                         for (int i = 0; i < num_results; i++) {
-                            int idx = search_results[i];
-                            printf("  %d. %s\n", idx + 1, library->entries[idx].original_filename);
-                        }
+                                int idx = search_results[i];
+                                file_metadata_t *m = get_library_entry(library, idx);
+                                if (m) printf("  %d. %s\n", idx + 1, m->original_filename);
+                            }
                     } else {
                         printf("No files found matching '%s'\n", search_pattern);
                     }
@@ -335,12 +334,12 @@ int file_management_menu(encryption_library_t *library)
                 break;
                 
             case 3: // Delete file
-                if (library->count == 0) {
+                if (get_library_count(library) == 0) {
                     printf("No files in library to delete.\n");
                     break;
                 }
                 display_library_contents(library, SORT_BY_NAME);
-                file_index = get_user_choice("Enter file number to delete (0 to cancel): ", 0, library->count);
+                file_index = get_user_choice("Enter file number to delete (0 to cancel): ", 0, get_library_count(library));
                 if (file_index > 0) {
                     result = delete_encrypted_file(library, file_index - 1);
                     if (result == SUCCESS) {
@@ -350,12 +349,12 @@ int file_management_menu(encryption_library_t *library)
                 break;
                 
             case 4: // Rename file
-                if (library->count == 0) {
+                if (get_library_count(library) == 0) {
                     printf("No files in library to rename.\n");
                     break;
                 }
                 display_library_contents(library, SORT_BY_NAME);
-                file_index = get_user_choice("Enter file number to rename (0 to cancel): ", 0, library->count);
+                file_index = get_user_choice("Enter file number to rename (0 to cancel): ", 0, get_library_count(library));
                 if (file_index > 0) {
                     printf("Enter new filename: ");
                     if (fgets(new_name, sizeof(new_name), stdin)) {

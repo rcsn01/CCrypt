@@ -1,9 +1,8 @@
-/**
- * @file encryption.c
- * @brief File encryption and decryption functions for CCrypt
- * @author Chu-Cheng Yu and contributors
- * @date September 2025
- * 
+/*
+ * encryption.c
+ * File encryption and decryption functions for CCrypt
+ * Chu-Cheng Yu and contributors
+ * September 2025
  * This file contains all encryption, decryption, and compression related functions.
  */
 
@@ -17,9 +16,9 @@
  * FILE ENCRYPTION FUNCTIONS
  * ======================================================================== */
 
-/**
- * @brief Complete workflow for encrypting a user-specified file
- * @author [Chu-Cheng Yu]
+/*
+ * Complete workflow for encrypting a user-specified file
+ * [Chu-Cheng Yu]
  */
 int encrypt_file_workflow(encryption_library_t *library)
 {
@@ -90,9 +89,9 @@ int encrypt_file_workflow(encryption_library_t *library)
     return result;
 }
 
-/**
- * @brief Encrypt a file with optional compression
- * @author [Your Name Here]
+/*
+ * Encrypt a file with optional compression
+ * [Your Name Here]
  */
 int encrypt_file(const char *input_path, const char *output_path, 
                  const char *password, int use_compression, 
@@ -116,9 +115,9 @@ int encrypt_file(const char *input_path, const char *output_path,
     return SUCCESS; /* Placeholder */
 }
 
-/**
- * @brief Complete workflow for decrypting a file from the library
- * @author [Your Name Here]
+/*
+ * Complete workflow for decrypting a file from the library
+ * [Your Name Here]
  */
 int decrypt_file_workflow(encryption_library_t *library)
 {
@@ -127,12 +126,12 @@ int decrypt_file_workflow(encryption_library_t *library)
     return SUCCESS;
 }
 
-/**
- * @brief Present library to user and select an entry for decryption (stub)
- * @param library Pointer to the encryption library instance
- * @param selected_index Out parameter to receive the selected index (0-based)
- * @return SUCCESS if a selection was made, or ERROR_FILE_NOT_FOUND if library empty
- * @author [Empty]
+/*
+ * Present library to user and select an entry for decryption (stub)
+ * library Pointer to the encryption library instance
+ * selected_index Out parameter to receive the selected index (0-based)
+ * SUCCESS if a selection was made, or ERROR_FILE_NOT_FOUND if library empty
+ * [Empty]
  */
 int select_file_for_decryption(encryption_library_t *library, int *selected_index)
 {
@@ -142,15 +141,15 @@ int select_file_for_decryption(encryption_library_t *library, int *selected_inde
     return SUCCESS;
 }
 
-/**
- * @brief Decrypt an encrypted file (placeholder implementation)
- * @param encrypted_path Path to the encrypted input file
- * @param output_path Path where the decrypted output should be written
- * @param password Password used for decryption
- * @param method Encryption method used (encryption_method_t)
- * @param metadata Optional pointer to file metadata associated with the file
- * @return SUCCESS on success, or an error code on failure
- * @author [Empty]
+/*
+ * Decrypt an encrypted file (placeholder implementation)
+ * encrypted_path Path to the encrypted input file
+ * output_path Path where the decrypted output should be written
+ * password Password used for decryption
+ * method Encryption method used (encryption_method_t)
+ * metadata Optional pointer to file metadata associated with the file
+ * SUCCESS on success, or an error code on failure
+ * [Empty]
  */
 int decrypt_file(const char *encrypted_path, const char *output_path,
                  const char *password, encryption_method_t method, const file_metadata_t *metadata)
@@ -165,9 +164,9 @@ int decrypt_file(const char *encrypted_path, const char *output_path,
  * ENCRYPTION/COMPRESSION ALGORITHMS
  * ======================================================================== */
 
-/**
- * @brief Apply compression algorithm to file data
- * @author [Gordon Huang]
+/*
+ * Apply compression algorithm to file data
+ * [Gordon Huang]
  */
 int compress_data(const unsigned char *input_data, long input_size,
                   unsigned char *output_data, long *output_size)
@@ -176,9 +175,9 @@ int compress_data(const unsigned char *input_data, long input_size,
     return SUCCESS;
 }
 
-/**
- * @brief Apply encryption cipher to file data
- * @author [Your Name Here]
+/*
+ * Apply encryption cipher to file data
+ * [Your Name Here]
  */
 int encrypt_data(const unsigned char *input_data, long data_size,
                  const char *password, unsigned char *output_data)
@@ -188,14 +187,14 @@ int encrypt_data(const unsigned char *input_data, long data_size,
     return SUCCESS;
 }
 
-/**
- * @brief Decrypt a buffer of data using the supplied password (stub)
- * @param encrypted_data Pointer to input encrypted bytes
- * @param data_size Size of input buffer in bytes
- * @param password Password used to derive the decryption key
- * @param output_data Output buffer to receive decrypted bytes (must be allocated)
- * @return SUCCESS on success, error code on invalid input
- * @author [Empty]
+/*
+ * Decrypt a buffer of data using the supplied password (stub)
+ * encrypted_data Pointer to input encrypted bytes
+ * data_size Size of input buffer in bytes
+ * password Password used to derive the decryption key
+ * output_data Output buffer to receive decrypted bytes (must be allocated)
+ * SUCCESS on success, error code on invalid input
+ * [Empty]
  */
 int decrypt_data(const unsigned char *encrypted_data, long data_size,
                  const char *password, unsigned char *output_data)
@@ -208,14 +207,14 @@ int decrypt_data(const unsigned char *encrypted_data, long data_size,
     return SUCCESS;
 }
 
-/**
- * @brief Decompress a buffer produced by compress_data (stub)
- * @param compressed_data Pointer to compressed input bytes
- * @param compressed_size Size of compressed input in bytes
- * @param output_data Output buffer to receive decompressed bytes (must be allocated)
- * @param output_size Out parameter to receive number of decompressed bytes
- * @return SUCCESS on success, error code on invalid input
- * @author [Gordon Huang]
+/*
+ * Decompress a buffer produced by compress_data (stub)
+ * compressed_data Pointer to compressed input bytes
+ * compressed_size Size of compressed input in bytes
+ * output_data Output buffer to receive decompressed bytes (must be allocated)
+ * output_size Out parameter to receive number of decompressed bytes
+ * SUCCESS on success, error code on invalid input
+ * [Gordon Huang]
  */
 int decompress_data(const unsigned char *compressed_data, long compressed_size,
                     unsigned char *output_data, long *output_size)

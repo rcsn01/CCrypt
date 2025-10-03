@@ -1,16 +1,13 @@
-/**
- * @file ccrypt.h
- * @brief Main header file for CCrypt - A CLI file encryption and compression tool
- * @author Chu-Cheng Yu
- * @date September 2025
- * 
+/*
+ * ccrypt.h
+ * Main header file for CCrypt - A CLI file encryption and compression tool
+ * Chu-Cheng Yu
+ * September 2025
  * CCrypt is a command-line tool for encrypting and decrypting files with optional
  * compression. It maintains a library of encrypted files and provides management
  * capabilities including sorting, renaming, and deletion.
- * 
  * This main header contains core data structures, constants, and type definitions
  * used throughout the CCrypt application.
- * 
  * Constraints: Uses only standard C libraries (stdio.h, stdlib.h, string.h, math.h)
  */
 
@@ -64,9 +61,9 @@ typedef enum {
  * DATA STRUCTURES
  * ======================================================================== */
 
-/**
- * @struct file_metadata
- * @brief Structure to store metadata for encrypted files
+/*
+ * file_metadata
+ * Structure to store metadata for encrypted files
  */
 typedef struct {
     char original_filename[MAX_FILENAME_LENGTH];
@@ -81,12 +78,17 @@ typedef struct {
     char checksum[33]; /* MD5-style checksum for integrity */
 } file_metadata_t;
 
-/**
- * @struct encryption_library
- * @brief Structure to manage the library of encrypted files
+/*
+ * encryption_library
+ * Structure to manage the library of encrypted files
  */
+typedef struct file_node {
+    file_metadata_t data;
+    struct file_node *next;
+} file_node_t;
+
 typedef struct {
-    file_metadata_t entries[MAX_LIBRARY_ENTRIES];
+    file_node_t *head; /* linked list head for dynamic storage */
     int count;
     int is_modified;
     unsigned long next_id;
@@ -96,17 +98,17 @@ typedef struct {
  * CORE PROGRAM FUNCTION DECLARATIONS
  * ======================================================================== */
 
-/**
- * @brief Initialize program components and load encryption library
- * @param library Pointer to library structure to initialize
- * @return SUCCESS on success, error code on failure
+/*
+ * Initialize program components and load encryption library
+ * library Pointer to library structure to initialize
+ * SUCCESS on success, error code on failure
  */
 int initialize_program(encryption_library_t *library);
 
-/**
- * @brief Clean up program resources and save library before exit
- * @param library Pointer to library structure to cleanup
- * @return SUCCESS on success, error code on failure
+/*
+ * Clean up program resources and save library before exit
+ * library Pointer to library structure to cleanup
+ * SUCCESS on success, error code on failure
  */
 int cleanup_program(encryption_library_t *library);
 

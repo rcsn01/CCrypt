@@ -1,11 +1,9 @@
-/**
- * @file main.c
- * @brief Main entry point and program initialization for CCrypt
- * @author Chu-Cheng Yu
- * @date September 2025
- * 
+/*
+ * main.c
+ * Main entry point and program initialization for CCrypt
+ * Chu-Cheng Yu
+ * September 2025
  * This file contains the main function and core program initialization/cleanup logic.
- * 
  * $env:Path = 'C:\msys64\mingw64\bin;' + $env:Path
  * gcc --version
  * Compilation: gcc -o ccrypt main.c ui.c encryption.c library.c utils.c -lm
@@ -28,9 +26,9 @@ static encryption_library_t g_library;
  * MAIN PROGRAM FUNCTIONS
  * ======================================================================== */
 
-/**
- * @brief Main entry point for the CCrypt program
- * @author [Chu-Cheng Yu]
+/*
+ * Main entry point for the CCrypt program
+ * [Chu-Cheng Yu]
  */
 int main(int argc, char *argv[])
 {
@@ -55,14 +53,15 @@ int main(int argc, char *argv[])
     return (result == SUCCESS) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-/**
- * @brief Initialize program components and load encryption library
- * @author [Chu-Cheng Yu]
+/*
+ * Initialize program components and load encryption library
+ * [Chu-Cheng Yu]
  */
 int initialize_program(encryption_library_t *library)
 {
     /* Initialize library structure */
     memset(library, 0, sizeof(encryption_library_t));
+    library->head = NULL;
     library->count = 0;
     library->is_modified = 0;
     /* Initialize ID counter */
@@ -80,9 +79,9 @@ int initialize_program(encryption_library_t *library)
     return result;
 }
 
-/**
- * @brief Clean up program resources and save library before exit
- * @author [Chu-Cheng Yu]
+/*
+ * Clean up program resources and save library before exit
+ * [Chu-Cheng Yu]
  */
 int cleanup_program(encryption_library_t *library)
 {
@@ -93,7 +92,8 @@ int cleanup_program(encryption_library_t *library)
         printf("Saving encryption library...\n");
         result = save_encryption_library(library);
     }
-    
+    /* free library nodes */
+    free_library(library);
     /* Clear sensitive data from memory */
     secure_memory_clear(library, sizeof(encryption_library_t));
     

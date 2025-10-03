@@ -1,9 +1,8 @@
-/**
- * @file library.c
- * @brief Library management functions for CCrypt
- * @author Chu-Cheng Yu and contributors
- * @date September 2025
- * 
+/*
+ * library.c
+ * Library management functions for CCrypt
+ * Chu-Cheng Yu and contributors
+ * September 2025
  * This file contains functions for managing the encryption library including
  * loading, saving, sorting, searching, and displaying library entries.
  */
@@ -13,120 +12,167 @@
 #include "ui.h"
 #include "utils.h"
 
+/* forward declarations for comparators used by qsort */
+static int cmp_name(const void *a, const void *b);
+static int cmp_date(const void *a, const void *b);
+static int cmp_size(const void *a, const void *b);
+static int cmp_type(const void *a, const void *b);
+
 /* ========================================================================
  * LIBRARY MANAGEMENT FUNCTIONS
  * ======================================================================== */
 
-/**
- * @brief Load encryption library from disk
- * @author [Gordon Huang]
+/*
+ * Load encryption library from disk
+ * [Gordon Huang]
  */
 int load_encryption_library(encryption_library_t *library)
 {
-    /* TODO: Implement library loading logic */
+    /* Minimal loader stub: clear list */
+    if (!library) return ERROR_INVALID_PATH;
+    library->head = NULL;
+    library->count = 0;
+    library->is_modified = 0;
+    library->next_id = 1;
     return SUCCESS;
 }
 
-/**
- * @brief Save encryption library to disk
- * @author [Agam Grewal]
+/*
+ * Save encryption library to disk
+ * [Agam Grewal]
  */
 int save_encryption_library(encryption_library_t *library)
 {
+    /* Minimal saver stub: nothing to do for now */
+    (void)library;
     return SUCCESS;
 }
 
-/**
- * @brief Add new encrypted file entry to library
- * @author [Chu-Cheng Yu]
+/*
+ * Add new encrypted file entry to library
+ * [Chu-Cheng Yu]
  */
 int add_file_to_library(encryption_library_t *library, const file_metadata_t *metadata)
 {
-    if (library->count >= MAX_LIBRARY_ENTRIES) {
-        return ERROR_MEMORY_ALLOCATION;
+    if (!library || !metadata) return ERROR_INVALID_PATH;
+
+    file_node_t *node = (file_node_t *)malloc(sizeof(file_node_t));
+    if (!node) return ERROR_MEMORY_ALLOCATION;
+    node->data = *metadata;
+    node->next = NULL;
+
+    /* append to end */
+    if (!library->head) {
+        library->head = node;
+    } else {
+        file_node_t *cur = library->head;
+        while (cur->next) cur = cur->next;
+        cur->next = node;
     }
-    
-    library->entries[library->count] = *metadata;
     library->count++;
     library->is_modified = 1;
-    
     return SUCCESS;
 }
 
-/**
- * @brief Remove a library entry at the specified index
- * @param library Pointer to the encryption library
- * @param index Index of entry to remove (0-based)
- * @return SUCCESS on success, or error code for invalid parameters
- * @author [Chu-Cheng Yu]
+/*
+ * Remove a library entry at the specified index
+ * library Pointer to the encryption library
+ * index Index of entry to remove (0-based)
+ * SUCCESS on success, or error code for invalid parameters
+ * [Chu-Cheng Yu]
  */
 int remove_file_from_library(encryption_library_t *library, int index)
 {
     if (!library) return ERROR_INVALID_PATH;
     if (index < 0 || index >= library->count) return ERROR_INVALID_PATH;
-    /* Shift entries down to fill gap */
-    for (int i = index; i + 1 < library->count; ++i) {
-        library->entries[i] = library->entries[i + 1];
+
+    file_node_t *prev = NULL;
+    file_node_t *cur = library->head;
+    int i = 0;
+    while (cur && i < index) {
+        prev = cur;
+        cur = cur->next;
+        i++;
     }
+    if (!cur) return ERROR_INVALID_PATH;
+    if (prev) prev->next = cur->next;
+    else library->head = cur->next;
+    free(cur);
     library->count--;
     library->is_modified = 1;
     return SUCCESS;
 }
 
-/**
- * @brief Display all files in the encryption library
- * @author [Chu-Cheng Yu]
+/*
+ * Display all files in the encryption library
+ * [Chu-Cheng Yu]
  */
 void display_library_contents(encryption_library_t *library, sort_option_t sort_option)
 {
-    if (library->count == 0) {
+    if (!library || library->count == 0) {
         printf("No encrypted files in library.\n");
         return;
     }
-    
-    /* Sort library based on sort_option */
+
+    /* Build a temporary array for sorting/display */
+    int n = library->count;
+    file_metadata_t *arr = (file_metadata_t *)malloc(sizeof(file_metadata_t) * n);
+    if (!arr) {
+        printf("Memory error\n");
+        return;
+    }
+    file_node_t *cur = library->head;
+    for (int i = 0; i < n && cur; ++i, cur = cur->next) arr[i] = cur->data;
+
+    /* Sort array based on option */
     switch (sort_option) {
         case SORT_BY_NAME:
-            sort_library_by_name(library);
+            qsort(arr, n, sizeof(file_metadata_t), cmp_name);
             break;
         case SORT_BY_DATE:
-            sort_library_by_date(library);
+            qsort(arr, n, sizeof(file_metadata_t), cmp_date);
             break;
         case SORT_BY_SIZE:
-            sort_library_by_size(library);
+            qsort(arr, n, sizeof(file_metadata_t), cmp_size);
             break;
         case SORT_BY_TYPE:
-            sort_library_by_type(library);
+            qsort(arr, n, sizeof(file_metadata_t), cmp_type);
+            break;
+        default:
             break;
     }
-    
-    printf("\nEncrypted Files Library (%d entries):\n", library->count);
+
+    printf("\nEncrypted Files Library (%d entries):\n", n);
     printf("=====================================\n");
     printf("%-3s %-20s %-10s %-12s %-10s\n", "No.", "Filename", "Size", "Date", "Compressed");
     printf("-------------------------------------------------------------\n");
-    
-    for (int i = 0; i < library->count; i++) {
-        printf("%-3d %-20s %-10ld %-12lu %-10s\n", 
+    for (int i = 0; i < n; ++i) {
+        printf("%-3d %-20s %-10ld %-12lu %-10s\n",
                i + 1,
-               library->entries[i].original_filename,
-               library->entries[i].original_size,
-               library->entries[i].encryption_id,
-               library->entries[i].is_compressed ? "Yes" : "No");
+               arr[i].original_filename,
+               arr[i].original_size,
+               arr[i].encryption_id,
+               arr[i].is_compressed ? "Yes" : "No");
     }
+    free(arr);
 }
 
-/**
- * @brief Print detailed information about a library entry
- * @param library Pointer to the encryption library
- * @param index Index of the entry to display (0-based)
- * @return void
- * @author [Chu-Cheng Yu]
+/*
+ * Print detailed information about a library entry
+ * library Pointer to the encryption library
+ * index Index of the entry to display (0-based)
+ * void
+ * [Chu-Cheng Yu]
  */
 void display_file_information(encryption_library_t *library, int index)
 {
     if (!library) return;
     if (index < 0 || index >= library->count) return;
-    file_metadata_t *m = &library->entries[index];
+    int i = 0;
+    file_node_t *cur = library->head;
+    while (cur && i < index) { cur = cur->next; i++; }
+    if (!cur) return;
+    file_metadata_t *m = &cur->data;
     printf("File information for entry %d:\n", index + 1);
     printf(" Original: %s\n", m->original_filename);
     printf(" Encrypted: %s\n", m->encrypted_filename);
@@ -136,74 +182,93 @@ void display_file_information(encryption_library_t *library, int index)
     printf(" Method: %d\n", m->encryption_method);
 }
 
-/**
- * @brief Search the library for filenames containing a substring
- * @param library Pointer to encryption library
- * @param search_pattern Substring to search for
- * @param results Array to receive matched indices
- * @param max_results Maximum number of results to store in results array
- * @return Number of matches found (may be 0)
- * @author [Chu-Cheng Yu]
+/*
+ * Search the library for filenames containing a substring
+ * library Pointer to encryption library
+ * search_pattern Substring to search for
+ * results Array to receive matched indices
+ * max_results Maximum number of results to store in results array
+ * Number of matches found (may be 0)
+ * [Chu-Cheng Yu]
  */
 int search_library_by_name(encryption_library_t *library, const char *search_pattern,
                            int *results, int max_results)
 {
     if (!library || !search_pattern || !results || max_results <= 0) return 0;
     int found = 0;
-    for (int i = 0; i < library->count && found < max_results; ++i) {
-        if (strstr(library->entries[i].original_filename, search_pattern)) {
+    int i = 0;
+    file_node_t *cur = library->head;
+    while (cur && found < max_results) {
+        if (strstr(cur->data.original_filename, search_pattern)) {
             results[found++] = i;
         }
+        cur = cur->next;
+        i++;
     }
     return found;
 }
 
-/**
- * @brief Delete an encrypted file from disk and remove it from the library
- * @param library Pointer to the encryption library
- * @param index Index of the entry to delete (0-based)
- * @return SUCCESS on success, or error code on failure
- * @author [Haoyang Che]
+/*
+ * Delete an encrypted file from disk and remove it from the library
+ * library Pointer to the encryption library
+ * index Index of the entry to delete (0-based)
+ * SUCCESS on success, or error code on failure
+ * [Haoyang Che]
  */
 int delete_encrypted_file(encryption_library_t *library, int index)
 {
-    if (!library) return ERROR_INVALID_PATH;
-    if (index < 0 || index >= library->count) return ERROR_INVALID_PATH;
-    /* Ask for confirmation */
-    char prompt[256];
-    snprintf(prompt, sizeof(prompt), "Delete '%s'? (y/n): ", library->entries[index].encrypted_filename);
-    if (!get_user_confirmation(prompt)) return SUCCESS; /* cancelled */
-    /* Remove file from filesystem */
-    if (remove(library->entries[index].encrypted_filename) != 0) {
-        /* best-effort: still remove library entry */
-        /* continue */
-    }
-    return remove_file_from_library(library, index);
+    return SUCCESS;
 }
 
-/**
- * @brief Rename an encrypted file on disk and update library metadata
- * @param library Pointer to the encryption library
- * @param index Index of the entry to rename (0-based)
- * @param new_name New filename to apply
- * @return SUCCESS on success, or an error code on failure
- * @author [Haoyang Che]
+/*
+ * Rename an encrypted file on disk and update library metadata
+ * library Pointer to the encryption library
+ * index Index of the entry to rename (0-based)
+ * new_name New filename to apply
+ * SUCCESS on success, or an error code on failure
+ * [Haoyang Che]
  */
 int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
 {
-    if (!library || !new_name) return ERROR_INVALID_PATH;
-    if (index < 0 || index >= library->count) return ERROR_INVALID_PATH;
-    /* Attempt to rename on filesystem */
-    if (rename(library->entries[index].encrypted_filename, new_name) != 0) {
-        return ERROR_PERMISSION_DENIED;
-    }
-    safe_string_copy(library->entries[index].encrypted_filename, new_name, sizeof(library->entries[index].encrypted_filename));
-    library->is_modified = 1;
     return SUCCESS;
+}
+
+/* Helper: return count */
+int get_library_count(encryption_library_t *library)
+{
+    if (!library) return 0;
+    return library->count;
+}
+
+/* Helper: return pointer to metadata for index (NULL if OOB) */
+file_metadata_t *get_library_entry(encryption_library_t *library, int index)
+{
+    if (!library || index < 0 || index >= library->count) return NULL;
+    int i = 0;
+    file_node_t *cur = library->head;
+    while (cur && i < index) { cur = cur->next; i++; }
+    if (!cur) return NULL;
+    return &cur->data;
+}
+
+/* Helper: free entire library list */
+void free_library(encryption_library_t *library)
+{
+    if (!library) return;
+    file_node_t *cur = library->head;
+    while (cur) {
+        file_node_t *next = cur->next;
+        free(cur);
+        cur = next;
+    }
+    library->head = NULL;
+    library->count = 0;
+    library->is_modified = 0;
 }
 
 /* ========================================================================
  * LIBRARY SORTING FUNCTIONS
+ * Author Chu-Cheng Yu
  * ======================================================================== */
 
 /* Simple sort helpers: use qsort with wrappers */
@@ -239,57 +304,91 @@ static int cmp_type(const void *a, const void *b)
     return strcasecmp(x->file_type, y->file_type);
 }
 
-/**
- * @brief Sort library entries alphabetically by original filename
- * @param library Pointer to the encryption library
- * @author [Chu-Cheng Yu]
+/*
+ * Sort library entries alphabetically by original filename
+ * library Pointer to the encryption library
+ * [Chu-Cheng Yu]
  */
 void sort_library_by_name(encryption_library_t *library)
 {
     if (!library || library->count <= 1) return;
-    qsort(library->entries, (size_t)library->count, sizeof(file_metadata_t), cmp_name);
+    int n = library->count;
+    file_metadata_t *arr = malloc(sizeof(file_metadata_t) * n);
+    if (!arr) return;
+    file_node_t *cur = library->head;
+    for (int i = 0; i < n && cur; ++i, cur = cur->next) arr[i] = cur->data;
+    qsort(arr, n, sizeof(file_metadata_t), cmp_name);
+    /* rebuild linked list in sorted order */
+    cur = library->head;
+    int i = 0;
+    while (cur && i < n) { cur->data = arr[i++]; cur = cur->next; }
+    free(arr);
 }
 
-/**
- * @brief Sort library entries by encryption id (most recent first)
- * @param library Pointer to the encryption library
- * @author [Chu-Cheng Yu]
+/*
+ * Sort library entries by encryption id (most recent first)
+ * library Pointer to the encryption library
+ * [Chu-Cheng Yu]
  */
 void sort_library_by_date(encryption_library_t *library)
 {
     if (!library || library->count <= 1) return;
-    qsort(library->entries, (size_t)library->count, sizeof(file_metadata_t), cmp_date);
+    int n = library->count;
+    file_metadata_t *arr = malloc(sizeof(file_metadata_t) * n);
+    if (!arr) return;
+    file_node_t *cur = library->head;
+    for (int i = 0; i < n && cur; ++i, cur = cur->next) arr[i] = cur->data;
+    qsort(arr, n, sizeof(file_metadata_t), cmp_date);
+    cur = library->head; int i = 0;
+    while (cur && i < n) { cur->data = arr[i++]; cur = cur->next; }
+    free(arr);
 }
 
-/**
- * @brief Sort library entries by original file size (largest first)
- * @param library Pointer to the encryption library
- * @author [Chu-Cheng Yu]
+/*
+ * Sort library entries by original file size (largest first)
+ * library Pointer to the encryption library
+ * [Chu-Cheng Yu]
  */
 void sort_library_by_size(encryption_library_t *library)
 {
     if (!library || library->count <= 1) return;
-    qsort(library->entries, (size_t)library->count, sizeof(file_metadata_t), cmp_size);
+    int n = library->count;
+    file_metadata_t *arr = malloc(sizeof(file_metadata_t) * n);
+    if (!arr) return;
+    file_node_t *cur = library->head;
+    for (int i = 0; i < n && cur; ++i, cur = cur->next) arr[i] = cur->data;
+    qsort(arr, n, sizeof(file_metadata_t), cmp_size);
+    cur = library->head; int i = 0;
+    while (cur && i < n) { cur->data = arr[i++]; cur = cur->next; }
+    free(arr);
 }
 
-/**
- * @brief Sort library entries by file type/extension
- * @param library Pointer to the encryption library
- * @author [Chu-Cheng Yu]
+/*
+ * Sort library entries by file type/extension
+ * library Pointer to the encryption library
+ * [Chu-Cheng Yu]
  */
 void sort_library_by_type(encryption_library_t *library)
 {
     if (!library || library->count <= 1) return;
-    qsort(library->entries, (size_t)library->count, sizeof(file_metadata_t), cmp_type);
+    int n = library->count;
+    file_metadata_t *arr = malloc(sizeof(file_metadata_t) * n);
+    if (!arr) return;
+    file_node_t *cur = library->head;
+    for (int i = 0; i < n && cur; ++i, cur = cur->next) arr[i] = cur->data;
+    qsort(arr, n, sizeof(file_metadata_t), cmp_type);
+    cur = library->head; int i = 0;
+    while (cur && i < n) { cur->data = arr[i++]; cur = cur->next; }
+    free(arr);
 }
 
-/**
- * @brief Compare two metadata entries according to a sort option
- * @param a Pointer to first metadata entry
- * @param b Pointer to second metadata entry
- * @param sort_type Sorting criteria (see sort_option_t)
- * @return negative/zero/positive as in strcmp-style comparators
- * @author [Chu-Cheng Yu]
+/*
+ * Compare two metadata entries according to a sort option
+ * a Pointer to first metadata entry
+ * b Pointer to second metadata entry
+ * sort_type Sorting criteria (see sort_option_t)
+ * negative/zero/positive as in strcmp-style comparators
+ * [Chu-Cheng Yu]
  */
 int compare_metadata_entries(const file_metadata_t *a, const file_metadata_t *b, 
                             sort_option_t sort_type)
