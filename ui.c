@@ -257,7 +257,7 @@ int get_user_confirmation(const char *operation_description)
  * @param password Buffer to receive the password string
  * @param buffer_size Size of the password buffer
  * @return SUCCESS on success, or ERROR_INVALID_PASSWORD on failure
- * @author [Empty]
+ * @author [Gordon Huang]
  */
 int get_decryption_password(char *password, size_t buffer_size)
 {
