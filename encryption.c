@@ -215,7 +215,7 @@ int decrypt_data(const unsigned char *encrypted_data, long data_size,
  * @param output_data Output buffer to receive decompressed bytes (must be allocated)
  * @param output_size Out parameter to receive number of decompressed bytes
  * @return SUCCESS on success, error code on invalid input
- * @author [Empty]
+ * @author [Gordon Huang]
  */
 int decompress_data(const unsigned char *compressed_data, long compressed_size,
                     unsigned char *output_data, long *output_size)
