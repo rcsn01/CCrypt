@@ -29,7 +29,7 @@ int load_encryption_library(encryption_library_t *library)
 
 /**
  * @brief Save encryption library to disk
- * @author [Your Name Here]
+ * @author [Agam Grewal]
  */
 int save_encryption_library(encryption_library_t *library)
 {
