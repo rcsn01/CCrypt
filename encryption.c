@@ -18,7 +18,7 @@
 
 /*
  * Complete workflow for encrypting a user-specified file
- * [Chu-Cheng Yu]
+ * [Agam Grewal]
  */
 int encrypt_file_workflow(encryption_library_t *library)
 {
@@ -91,7 +91,7 @@ int encrypt_file_workflow(encryption_library_t *library)
 
 /*
  * Encrypt a file with optional compression
- * [Your Name Here]
+ * [Agam Grewal]
  */
 int encrypt_file(const char *input_path, const char *output_path, 
                  const char *password, int use_compression, 
@@ -117,7 +117,7 @@ int encrypt_file(const char *input_path, const char *output_path,
 
 /*
  * Complete workflow for decrypting a file from the library
- * [Your Name Here]
+ * [Agam Gewal]
  */
 int decrypt_file_workflow(encryption_library_t *library)
 {
@@ -177,7 +177,7 @@ int compress_data(const unsigned char *input_data, long input_size,
 
 /*
  * Apply encryption cipher to file data
- * [Your Name Here]
+ * [Agam Grewal]
  */
 int encrypt_data(const unsigned char *input_data, long data_size,
                  const char *password, unsigned char *output_data)

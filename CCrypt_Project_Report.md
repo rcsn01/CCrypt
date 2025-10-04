@@ -1,22 +1,50 @@
 # CCrypt Project Report
 
 ## 1. Executive Summary
-- Brief overview of the CCrypt tool
-- Key features and capabilities
-- Target audience summary
+CCrypt is a command line encryption tool developed in C that allows users to encrypt and decrypt individual \files with 
+the option to apply compression before encryption. The program addresses the need for secure file storage on third party 
+cloud platforms by ensuring that data is protected locally before it is uploaded. This approach gives users full control 
+over the confidentiality and integrity of their information, even if the storage provider experiences a security breach.
 
+The tool includes password based symmetric encryption, file integrity verification, a persistent encryption library for 
+tracking files, and an interactive command line 
+interface. Users can manage encrypted files by listing, renaming, and ]deleting them, and can organise their library using 
+different sorting options. The program is designed to be lightweight, portable, and compatible with standard C compilers, 
+with no reliance on external libraries.
+
+CCrypt is intended for both everyday users who require a simple security solution and for professionals who need a practical 
+method for protecting cloud stored data. It demonstrates the implementation of fundamental security and file management 
+functionality within the constraints of the C programming language, highlighting both technical capability and thoughtful 
+system design.
 ## 2. Project Introduction
 
 ### 2.1 Project Idea
-A CLI C tool that lets you encrypt and decrypt files, optionally with compression or without.
-
+CCrypt is a command line program developed in the C programming language that provides functionality for the secure encryption 
+and decryption of individual files, with an optional compression feature applied prior to encryption. The primary objective of 
+the tool is to enable users to safeguard their data before it is stored on third party cloud platforms. All encryption and file
+management processes are implemented within the constraints of standard C libraries, ensuring portability and transparency without 
+reliance on external dependencies.
 ### 2.2 Why is this program needed?
-In a case of using a third party storage service, encrypting your files becomes crucial since your files are now open to third party / attackers who manage to get into their database. By encrypting your cloud files and only decrypting when needed, you're able to protect all of your cloud data even if the third party failed to secure it.
-
+The increasing use of cloud storage services has introduced significant concerns regarding data privacy and security. When files 
+are stored on third party servers, users are required to trust the service provider’s security mechanisms, which may be 
+susceptible to breaches or unauthorised access. Even with strong organisational controls, the transfer of data to external 
+infrastructure reduces user control over confidentiality and integrity. Implementing local encryption before uploading data 
+provides an effective method of mitigating these risks, as files remain encrypted even if the storage provider’s systems are 
+compromised. This approach is particularly relevant for individuals and organisations handling sensitive information such as 
+personal records, financial data, or intellectual property.
 ### 2.3 How would this program be used?
-This program will be used to encrypt cloud data that can be mounted on your computer as a virtual drive, etc google drive, one drive, what not.
-
+CCrypt is designed to be operated through a command line interface. Users specify the file path and a password, and select 
+whether compression should be applied. The program then performs encryption locally and outputs an encrypted file, which can 
+subsequently be stored on any cloud platform such as Google Drive or OneDrive. When access is required, the user retrieves 
+the file and uses the same tool to decrypt it by providing the correct credentials. The program maintains a persistent local 
+library that records metadata for each encrypted file, enabling users to list, sort, rename, or remove files efficiently while 
+preserving an organised encryption history.
 ### 2.4 Who is our target user?
+The tool is intended for two main user groups. The primary group consists of general users who make regular use of cloud storage
+services but do not necessarily possess advanced technical expertise. For these users, CCrypt offers an accessible and reliable 
+method of enhancing data security. The secondary group comprises information technology professionals and organisations that 
+depend on cloud infrastructure for data storage. For this group, CCrypt provides a lightweight and portable encryption solution 
+that can be incorporated into broader data protection frameworks without significant overhead.
 - **Primary Users**: 
   - Everday Joe
   - Anyone who uses cloud storage
