@@ -229,7 +229,6 @@ int delete_encrypted_file(encryption_library_t *library, int index)
         /* continue */
     }
     return remove_file_from_library(library, index);
-    return SUCCESS;
 }
 
 /*
