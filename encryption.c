@@ -171,8 +171,31 @@ int decrypt_file(const char *encrypted_path, const char *output_path,
 int compress_data(const unsigned char *input_data, long input_size,
                   unsigned char *output_data, long *output_size)
 {
-    /* TODO: Implement simple compression algorithm */
-    return SUCCESS;
+    if (!input_data || input_size <= 0 || !output_data || !output_size)
+        return ERROR_INVALID_PATH;
+long out_index = 0;
+long i = 0;
+
+    while (i < input_size) {
+        unsigned char current = input_data[i];
+        unsigned char count = 1;
+
+        while ((i + count < input_size) && 
+            (input_data[i + count] == current) && 
+            (count < 255)) {
+        count++;
+        }
+        output_data[out_index++] = count;
+        output_data[out_index++] = current;
+
+        i += count;
+    }
+*output_size = out_index;
+if (*output_size >= input_size) {
+    memcpy(output_data, input_data, (size_t)input_size);
+    *output_size = input_size;
+    return SUCCESS; 
+    }
 }
 
 /*
