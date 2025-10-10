@@ -19,8 +19,9 @@
  * GLOBAL VARIABLES
  * ======================================================================== */
 
-/* Global encryption library instance */
-static encryption_library_t g_library;
+/* NOTE: encryption_library_t is now a local variable inside main() instead of a global.
+ * This keeps state scoped to the program entry and avoids a global variable.
+ */
 
 /* ========================================================================
  * MAIN PROGRAM FUNCTIONS
@@ -34,18 +35,20 @@ int main(int argc, char *argv[])
 {
     printf("CCrypt v1.0 - File Encryption and Compression Tool\n");
     printf("==================================================\n\n");
-    
+    /* Local encryption library instance */
+    encryption_library_t library;
+
     /* Initialize program and load library */
-    if (initialize_program(&g_library) != SUCCESS) {
+    if (initialize_program(&library) != SUCCESS) {
         fprintf(stderr, "Error: Failed to initialize program\n");
         return EXIT_FAILURE;
     }
     
     /* Run main program loop */
-    int result = main_menu_loop(&g_library);
+    int result = main_menu_loop(&library);
     
     /* Cleanup and save library */
-    if (cleanup_program(&g_library) != SUCCESS) {
+    if (cleanup_program(&library) != SUCCESS) {
         fprintf(stderr, "Warning: Failed to properly cleanup program\n");
     }
     
