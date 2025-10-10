@@ -217,18 +217,7 @@ int search_library_by_name(encryption_library_t *library, const char *search_pat
  */
 int delete_encrypted_file(encryption_library_t *library, int index)
 {
-    if (!library) return ERROR_INVALID_PATH;
-    if (index < 0 || index >= library->count) return ERROR_INVALID_PATH;
-    /* Ask for confirmation */
-    char prompt[256];
-    snprintf(prompt, sizeof(prompt), "Delete '%s'? (y/n): ", library->entries[index].encrypted_filename);
-    if (!get_user_confirmation(prompt)) return SUCCESS; /* cancelled */
-    /* Remove file from filesystem */
-    if (remove(library->entries[index].encrypted_filename) != 0) {
-        /* best-effort: still remove library entry */
-        /* continue */
-    }
-    return remove_file_from_library(library, index);
+    return SUCCESS;
 }
 
 /*
@@ -241,14 +230,6 @@ int delete_encrypted_file(encryption_library_t *library, int index)
  */
 int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
 {
-     if (!library || !new_name) return ERROR_INVALID_PATH;
-    if (index < 0 || index >= library->count) return ERROR_INVALID_PATH;
-    /* Attempt to rename on filesystem */
-    if (rename(library->entries[index].encrypted_filename, new_name) != 0) {
-        return ERROR_PERMISSION_DENIED;
-    }
-    safe_string_copy(library->entries[index].encrypted_filename, new_name, sizeof(library->entries[index].encrypted_filename));
-    library->is_modified = 1;
     return SUCCESS;
 }
 
