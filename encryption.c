@@ -245,7 +245,15 @@ int decompress_data(const unsigned char *compressed_data, long compressed_size,
     /* TODO: Implement decompression that matches compress_data (RLE or similar) */
     if (!compressed_data || compressed_size <= 0 || !output_data || !output_size) return ERROR_INVALID_PATH;
     /* passthrough */
-    memcpy(output_data, compressed_data, (size_t)compressed_size);
-    *output_size = compressed_size;
+    long out_index = 0;
+    for (long i = 0; i < compressed_size; i += 2) {
+        unsigned char count = compressed_data[i];
+        unsigned char value = compressed_data[i + 1];
+        for (unsigned char j = 0; j < count; j++) {
+            output_data[out_index++] = value;
+        }
+    }
+
+    *output_size = out_index;
     return SUCCESS;
 }
