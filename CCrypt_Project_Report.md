@@ -66,6 +66,10 @@ that can be incorporated into broader data protection frameworks without signifi
 - **Optional Compression**: User choice to compress files before encryption to reduce file size
 - **Compression Algorithms**: Implementation of basic compression techniques within C standard library constraints
 - **Size Optimization**: Reduce storage space requirements for encrypted files
+-Compression/Decompression Technique used
+The Compression Technique used for this project is Run-Length Encoding (RLE).This simple compression technique compresses data by replacing sequences of data with single instances of the data. For example, aaabbcc will become 3a2b2c.This technique was especially used for this program since the main file type that is used is txt files.In the case of how this technique is used in the program.For instance,a txt file that shows “Helloooooo world!!!” the function scans this from left to right and stores it in an array of memory where the number of the value goes first followed up with the value e.g [1]['w'][1]['o'][1]['r'][1]['l'][1]['d'].
+
+For the decompression part, the function reads through 2 bytes at a time because of the count and value of the array and expand and reconstruct it into a output array which will show the original content of the txt file.
 
 #### 3.1.3 Library Management System
 - **Encryption Registry**: Maintain a persistent record of all encrypted files and their metadata
