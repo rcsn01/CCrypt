@@ -7,6 +7,11 @@
  * loading, saving, sorting, searching, and displaying library entries.
  */
 
+/* ========================================================================
+ * DEBUG MODE TURN OFF BEFORE FINAL SUBMISSION
+ * ======================================================================== */
+#define DEBUG
+
 #include "ccrypt.h"
 #include "library.h"
 #include "ui.h"
@@ -71,6 +76,12 @@ int add_file_to_library(encryption_library_t *library, const file_metadata_t *me
     }
     library->count++;
     library->is_modified = 1;
+
+    #ifdef DEBUG
+        fprintf(stderr, "[DEBUG] Added file to library: %s\n", metadata->original_filename);
+        fprintf(stderr, "[DEBUG] library: %s\n", library->head->data.original_filename);
+    #endif
+
     return SUCCESS;
 }
 
