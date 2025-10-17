@@ -217,20 +217,8 @@ int search_library_by_name(encryption_library_t *library, const char *search_pat
  */
 int delete_encrypted_file(encryption_library_t *library, int index)
 {
-    printf("\n implemented!\n");
-    file_node_t* cur_file = get_library_entry(library, index);
-    if (!cur_file) {
-        return ERROR_INVALID_PATH;
-    }
-
-    int ret = remove(cur_file->data.original_filename);
-    if (ret != SUCCESS) {
-        return ERROR_DELETE_FAILED;
-    }
-
-    return remove_file_from_library(library, index);
+    return SUCCESS;
 }
-
 
 /*
  * Rename an encrypted file on disk and update library metadata
@@ -242,21 +230,14 @@ int delete_encrypted_file(encryption_library_t *library, int index)
  */
 int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
 {
-    // printf("\n implemented!\n");
-    if (!new_name) {
-        return ERROR_NEW_FILE_NAME;
-    }
-    file_metadata_t* cur_file = get_library_entry(library, index);
-    if (!cur_file) {
-        return ERROR_INVALID_PATH;
-    }
+    return SUCCESS;
+}
 
-    // Rename the encrypted file from disk
-    // TODO path + file need concat ?
-    int ret = rename(cur_file->original_filename, new_name);
-    if (ret != SUCCESS) {
-        return ERROR_RENAME_FAILED;
-    }
+/* Helper: return count */
+int get_library_count(encryption_library_t *library)
+{
+    if (!library) return 0;
+    return library->count;
 }
 
 /* Helper: return pointer to metadata for index (NULL if OOB) */
