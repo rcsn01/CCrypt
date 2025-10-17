@@ -93,26 +93,107 @@ int encrypt_file_workflow(encryption_library_t *library)
  * Encrypt a file with optional compression
  * [Agam Grewal]
  */
-int encrypt_file(const char *input_path, const char *output_path, 
-                 const char *password, int use_compression, 
+int encrypt_file(const char *input_path, const char *output_path,
+                 const char *password, int use_compression,
                  encryption_method_t method,
                  file_metadata_t *metadata)
 {
-    /* TODO: Implement file encryption logic */
-    printf("Encrypting file: %s -> %s\n", input_path, output_path);
-    printf("Compression: %s\n", use_compression ? "enabled" : "disabled");
-    
-    /* Initialize metadata structure */
+    FILE *fin = fopen(input_path, "rb");
+    if (!fin) {
+        printf("Error: could not open input file.\n");
+        return ERROR_FILE_NOT_FOUND;
+    }
+
+    // Determine file size
+    fseek(fin, 0, SEEK_END);
+    long input_size = ftell(fin);
+    rewind(fin);
+
+    // Allocate memory for reading the file
+    unsigned char *input_data = malloc(input_size);
+    if (!input_data) {
+        fclose(fin);
+        return ERROR_MEMORY_ALLOCATION;
+    }
+    fread(input_data, 1, input_size, fin);
+    fclose(fin);
+
+    // Optionally compress data before encryption
+    unsigned char *processed_data = malloc(input_size * 2);
+    long processed_size = input_size;
+
+    if (use_compression) {
+        compress_data(input_data, input_size, processed_data, &processed_size);
+        printf("Compression applied: reduced from %ld to %ld bytes\n", input_size, processed_size);
+    } else {
+        memcpy(processed_data, input_data, input_size);
+        processed_size = input_size;
+    }
+
+    // Allocate space for encrypted output
+    unsigned char *encrypted_data = malloc(processed_size);
+    if (!encrypted_data) {
+        free(input_data);
+        free(processed_data);
+        return ERROR_MEMORY_ALLOCATION;
+    }
+
+    /*
+     * Select encryption method
+     * Only XOR is implemented for now — others are placeholders
+     */
+    switch (method) {
+        case ENC_XOR:
+            printf("Using XOR encryption...\n");
+            encrypt_data(processed_data, processed_size, password, encrypted_data);
+            break;
+
+        case ENC_CAESAR:
+            printf("Caesar shift encryption not yet implemented.\n");
+            memcpy(encrypted_data, processed_data, processed_size);
+            break;
+
+        case ENC_AES:
+            printf("AES encryption not yet implemented.\n");
+            memcpy(encrypted_data, processed_data, processed_size);
+            break;
+
+        default:
+            printf("Error: unknown encryption method selected.\n");
+            free(input_data);
+            free(processed_data);
+            free(encrypted_data);
+            return ERROR_INVALID_PATH;
+    }
+
+    // Write the encrypted data to output file
+    FILE *fout = fopen(output_path, "wb");
+    if (!fout) {
+        printf("Error: could not open output file.\n");
+        free(input_data);
+        free(processed_data);
+        free(encrypted_data);
+        return ERROR_FILE_NOT_FOUND;
+    }
+    fwrite(encrypted_data, 1, processed_size, fout);
+    fclose(fout);
+
+    // Fill file metadata
     memset(metadata, 0, sizeof(file_metadata_t));
     safe_string_copy(metadata->original_filename, input_path, sizeof(metadata->original_filename));
     safe_string_copy(metadata->encrypted_filename, output_path, sizeof(metadata->encrypted_filename));
     metadata->is_compressed = use_compression;
-    /* Record chosen encryption method */
+    metadata->original_size = input_size;
+    metadata->encrypted_size = processed_size;
     metadata->encryption_method = (int)method;
-    /* Assign a unique encryption id (set by caller) */
-    /* metadata->encryption_id should already be set by caller */
-    
-    return SUCCESS; /* Placeholder */
+
+    // Clean up memory
+    free(input_data);
+    free(processed_data);
+    free(encrypted_data);
+
+    printf("File encrypted successfully!\n");
+    return SUCCESS;
 }
 
 /*
@@ -196,19 +277,29 @@ if (*output_size >= input_size) {
     *output_size = input_size;
     return SUCCESS; 
     }
+    return SUCCESS;
 }
 
 /*
- * Apply encryption cipher to file data
+ * XOR encryption using password-derived key
  * [Agam Grewal]
  */
 int encrypt_data(const unsigned char *input_data, long data_size,
                  const char *password, unsigned char *output_data)
 {
-    /* TODO: Implement XOR-based encryption with key derivation */
-    /* Simple XOR placeholder - replace with proper implementation */
+    if (!input_data || data_size <= 0 || !password || !output_data)
+        return ERROR_INVALID_PATH;
+
+    int pwlen = strlen(password);
+    if (pwlen == 0) return ERROR_INVALID_PASSWORD;
+
+    for (long i = 0; i < data_size; ++i) {
+        output_data[i] = input_data[i] ^ password[i % pwlen];
+    }
+
     return SUCCESS;
 }
+
 
 /*
  * Decrypt a buffer of data using the supplied password (stub)
@@ -222,11 +313,16 @@ int encrypt_data(const unsigned char *input_data, long data_size,
 int decrypt_data(const unsigned char *encrypted_data, long data_size,
                  const char *password, unsigned char *output_data)
 {
-    /* TODO: Implement decrypt for supported methods (XOR/Caesar) */
-    (void)password;
-    if (!encrypted_data || data_size <= 0 || !output_data) return ERROR_INVALID_PATH;
-    /* simple passthrough stub */
-    for (long i = 0; i < data_size; ++i) output_data[i] = encrypted_data[i];
+    if (!encrypted_data || data_size <= 0 || !password || !output_data)
+        return ERROR_INVALID_PATH;
+
+    int pwlen = strlen(password);
+    if (pwlen == 0) return ERROR_INVALID_PASSWORD;
+
+    for (long i = 0; i < data_size; ++i) {
+        output_data[i] = encrypted_data[i] ^ password[i % pwlen];
+    }
+
     return SUCCESS;
 }
 
