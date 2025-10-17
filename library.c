@@ -79,7 +79,7 @@ int add_file_to_library(encryption_library_t *library, const file_metadata_t *me
 
     #ifdef DEBUG
         fprintf(stderr, "[DEBUG] Added file to library: %s\n", metadata->original_filename);
-        fprintf(stderr, "[DEBUG] library: %s\n", library->head->data.original_filename);
+        fprintf(stderr, "[DEBUG] library count: %d\n", library->count);
     #endif
 
     return SUCCESS;
