@@ -36,13 +36,8 @@ int encrypt_file_workflow(encryption_library_t *library)
         return result;
     }
 
-    /* Ask user for encryption method */
-    printf("Choose encryption method:\n");
-    printf(" 1) AES (placeholder - not implemented)\n");
-    printf(" 2) XOR (placeholder - not implemented)\n");
-    printf(" 3) Caesar shift (placeholder - not implemented)\n");
-    result = get_user_choice("Encryption method (1-3): ", 1, 3);
-    method = (encryption_method_t)result;
+    /* Only XOR is supported; set method directly */
+    method = ENC_XOR;
     
     /* Ask about compression */
     use_compression = ask_compression_preference();
@@ -222,7 +217,7 @@ int encrypt_data(const unsigned char *input_data, long data_size,
 int decrypt_data(const unsigned char *encrypted_data, long data_size,
                  const char *password, unsigned char *output_data)
 {
-    /* TODO: Implement decrypt for supported methods (XOR/Caesar) */
+    /* TODO: Implement decrypt for supported method (XOR) */
     (void)password;
     if (!encrypted_data || data_size <= 0 || !output_data) return ERROR_INVALID_PATH;
     /* simple passthrough stub */

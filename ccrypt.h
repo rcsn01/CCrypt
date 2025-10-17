@@ -50,11 +50,9 @@ typedef enum {
     SORT_BY_TYPE = 4
 } sort_option_t;
 
-/* Encryption methods supported */
+/* Encryption methods supported (only XOR implemented) */
 typedef enum {
-    ENC_AES = 1,
-    ENC_XOR = 2,
-    ENC_CAESAR = 3
+    ENC_XOR = 1
 } encryption_method_t;
 
 /* ========================================================================
