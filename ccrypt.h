@@ -41,9 +41,6 @@
 #define ERROR_LIBRARY_CORRUPT -6
 #define ERROR_ENCRYPTION_FAILED -7
 #define ERROR_COMPRESSION_FAILED -8
-#define ERROR_RENAME_FAILED -9
-#define ERROR_DELETE_FAILED -10
-#define ERROR_NEW_FILE_NAME -11
 
 /* Sort options */
 typedef enum {
