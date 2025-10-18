@@ -228,7 +228,17 @@ int search_library_by_name(encryption_library_t *library, const char *search_pat
  */
 int delete_encrypted_file(encryption_library_t *library, int index)
 {
-    return SUCCESS;
+    file_metadata_t* cur_file = get_library_entry(library, index);
+    if (!cur_file) {
+        return ERROR_INVALID_PATH;
+    }
+
+    int ret = remove(cur_file->original_filename);
+    if (ret != SUCCESS) {
+        return ERROR_DELETE_FAILED;
+    }
+
+    return remove_file_from_library(library, index);
 }
 
 /*
@@ -241,6 +251,26 @@ int delete_encrypted_file(encryption_library_t *library, int index)
  */
 int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
 {
+    if (!new_name) {
+        return ERROR_NEW_FILE_NAME;
+    }
+    file_metadata_t* cur_file = get_library_entry(library, index);
+    if (!cur_file) {
+        return ERROR_INVALID_PATH;
+    }
+
+    // Rename the encrypted file from disk
+    // TODO path + file need concat ?
+    int ret = rename(cur_file->original_filename, new_name);
+    if (ret != SUCCESS) {
+        return ERROR_RENAME_FAILED;
+    }
+
+    // update library metadata of this file
+    strncpy(cur_file->encrypted_filename, new_name, MAX_FILENAME_LENGTH - 1);
+    // for safety
+    cur_file->encrypted_filename[MAX_FILENAME_LENGTH - 1] = '\0';
+
     return SUCCESS;
 }
 
