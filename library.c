@@ -28,23 +28,91 @@ static int cmp_type(const void *a, const void *b);
  */
 int load_encryption_library(encryption_library_t *library)
 {
-    /* Minimal loader stub: clear list */
     if (!library) return ERROR_INVALID_PATH;
+
+    free_library(library); 
+    FILE *fp = fopen(LIBRARY_FILENAME, "rb");
+    if (!fp) {
+        
+        library->head = NULL;
+        library->count = 0;
+        library->is_modified = 0;
+        library->next_id = 1;
+        return SUCCESS;
+    }
+
+      char signature[16] = {0};
+    fread(signature, sizeof(char), strlen(ENCRYPTION_SIGNATURE), fp);
+    if (strncmp(signature, ENCRYPTION_SIGNATURE, strlen(ENCRYPTION_SIGNATURE)) != 0) {
+        fclose(fp);
+        return ERROR_LIBRARY_CORRUPT;
+    }
+
+    fread(&library->count, sizeof(int), 1, fp);
+    fread(&library->next_id, sizeof(unsigned long), 1, fp);
+
     library->head = NULL;
-    library->count = 0;
+    file_node_t *prev = NULL;
+
+    for (int i = 0; i < library->count; ++i) {
+        file_metadata_t metadata;
+        if (fread(&metadata, sizeof(file_metadata_t), 1, fp) != 1) {
+            fclose(fp);
+            free_library(library);
+            return ERROR_LIBRARY_CORRUPT;
+        }
+
+        file_node_t *node = malloc(sizeof(file_node_t));
+        if (!node) {
+            fclose(fp);
+            free_library(library);
+            return ERROR_MEMORY_ALLOCATION;
+        }
+
+        node->data = metadata;
+        node->next = NULL;
+
+        if (!library->head)
+            library->head = node;
+        else
+            prev->next = node;
+
+        prev = node;
+    }
+
+    fclose(fp);
     library->is_modified = 0;
-    library->next_id = 1;
     return SUCCESS;
 }
 
 /*
  * Save encryption library to disk
- * [Agam Grewal]
+ * [Gordon]
  */
 int save_encryption_library(encryption_library_t *library)
 {
-    /* Minimal saver stub: nothing to do for now */
-    (void)library;
+  if (!library) return ERROR_INVALID_PATH;
+    if (!library->is_modified) return SUCCESS; 
+
+    FILE *fp = fopen(LIBRARY_FILENAME, "wb");
+    if (!fp) return ERROR_FILE_NOT_FOUND;
+
+    
+    fwrite(ENCRYPTION_SIGNATURE, sizeof(char), strlen(ENCRYPTION_SIGNATURE), fp);
+
+    
+    fwrite(&library->count, sizeof(int), 1, fp);
+    fwrite(&library->next_id, sizeof(unsigned long), 1, fp);
+
+    
+    file_node_t *cur = library->head;
+    while (cur) {
+     fwrite(&cur->data, sizeof(file_metadata_t), 1, fp);
+     cur = cur->next;
+    }
+
+    fclose(fp);
+    library->is_modified = 0;
     return SUCCESS;
 }
 
