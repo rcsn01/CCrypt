@@ -317,7 +317,7 @@ static int cmp_name(const void *a, const void *b)
 {
     const file_metadata_t *x = (const file_metadata_t *)a;
     const file_metadata_t *y = (const file_metadata_t *)b;
-    return strcasecmp(x->original_filename, y->original_filename);
+    return strncmp(x->original_filename, y->original_filename, MAX_FILENAME_LENGTH);
 }
 
 static int cmp_date(const void *a, const void *b)
@@ -342,7 +342,7 @@ static int cmp_type(const void *a, const void *b)
 {
     const file_metadata_t *x = (const file_metadata_t *)a;
     const file_metadata_t *y = (const file_metadata_t *)b;
-    return strcasecmp(x->file_type, y->file_type);
+    return strncmp(x->file_type, y->file_type, sizeof(x->file_type));
 }
 
 /*
@@ -436,10 +436,10 @@ int compare_metadata_entries(const file_metadata_t *a, const file_metadata_t *b,
 {
     if (!a || !b) return 0;
     switch (sort_type) {
-        case SORT_BY_NAME: return strcasecmp(a->original_filename, b->original_filename);
+    case SORT_BY_NAME: return strncmp(a->original_filename, b->original_filename, MAX_FILENAME_LENGTH);
         case SORT_BY_DATE: return (a->encryption_id < b->encryption_id) ? 1 : (a->encryption_id > b->encryption_id) ? -1 : 0;
         case SORT_BY_SIZE: return (a->original_size < b->original_size) ? 1 : (a->original_size > b->original_size) ? -1 : 0;
-        case SORT_BY_TYPE: return strcasecmp(a->file_type, b->file_type);
+    case SORT_BY_TYPE: return strncmp(a->file_type, b->file_type, sizeof(a->file_type));
         default: return 0;
     }
 }
