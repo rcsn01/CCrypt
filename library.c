@@ -28,7 +28,17 @@ static int cmp_type(const void *a, const void *b);
  */
 int load_encryption_library(encryption_library_t *library)
 {
-    if (!library) return ERROR_INVALID_PATH;
+    if (!library)
+    {
+       #ifdef DEBUG_MODE
+        fprintf(stderr, " save_encryption_library: library pointer is NULL\n");
+#endif 
+return ERROR_INVALID_PATH;
+    } 
+
+    #ifdef DEBUG_MODE
+    fprintf(stderr, " Attempting to save encryption library to '%s'\n", LIBRARY_FILENAME);
+#endif
 
     free_library(library); 
     FILE *fp = fopen(LIBRARY_FILENAME, "rb");
@@ -82,6 +92,10 @@ int load_encryption_library(encryption_library_t *library)
 
     fclose(fp);
     library->is_modified = 0;
+  
+    #ifdef DEBUG_MODE
+    fprintf(stderr, " Successfully loaded %d entries from library.\n", library->count);
+#endif
     return SUCCESS;
 }
 
@@ -114,6 +128,9 @@ int save_encryption_library(encryption_library_t *library)
     fclose(fp);
     library->is_modified = 0;
     return SUCCESS;
+      #ifdef DEBUG_MODE
+    fprintf(stderr, "Library successfully saved (%d entries).\n", index);
+    #endif
 }
 
 /*
