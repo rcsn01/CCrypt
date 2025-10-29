@@ -35,9 +35,27 @@ int validate_file_path(const char *file_path)
 int generate_encrypted_filename(const char *original_path, char *encrypted_filename, 
                                size_t buffer_size, unsigned long id)
 {
-    /* TODO: Generate secure filename based on hash or timestamp */
-    /* Use the provided id to create a deterministic filename without time.h */
-    snprintf(encrypted_filename, buffer_size, "encrypted_%lu.ccrypt", id);
+    if (!original_path || !encrypted_filename || buffer_size == 0) {
+        return ERROR_INVALID_PATH;
+    }
+    
+    /* Extract the base filename from the path */
+    const char *filename = strrchr(original_path, '/');
+    if (!filename) {
+        filename = strrchr(original_path, '\\');
+    }
+    filename = filename ? filename + 1 : original_path;
+    
+    /* Remove the original extension */
+    char base_name[MAX_FILENAME_LENGTH];
+    safe_string_copy(base_name, filename, sizeof(base_name));
+    char *ext = strrchr(base_name, '.');
+    if (ext) {
+        *ext = '\0';  /* Truncate at the extension */
+    }
+    
+    /* Create encrypted filename: original_name_without_ext.ccrypt */
+    snprintf(encrypted_filename, buffer_size, "%s.ccrypt", base_name);
     return SUCCESS;
 }
 
