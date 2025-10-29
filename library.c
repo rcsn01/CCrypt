@@ -33,23 +33,91 @@ static int cmp_type(const void *a, const void *b);
  */
 int load_encryption_library(encryption_library_t *library)
 {
-    /* Minimal loader stub: clear list */
-    if (!library) return ERROR_INVALID_PATH;
+   if (!library) return ERROR_INVALID_PATH;
+
+    free_library(library); 
+    FILE *fp = fopen(LIBRARY_FILENAME, "rb");
+    if (!fp) {
+        
+        library->head = NULL;
+        library->count = 0;
+        library->is_modified = 0;
+        library->next_id = 1;
+        return SUCCESS;
+    }
+
+      char signature[16] = {0};
+    fread(signature, sizeof(char), strlen(ENCRYPTION_SIGNATURE), fp);
+    if (strncmp(signature, ENCRYPTION_SIGNATURE, strlen(ENCRYPTION_SIGNATURE)) != 0) {
+        fclose(fp);
+        return ERROR_LIBRARY_CORRUPT;
+    }
+
+    fread(&library->count, sizeof(int), 1, fp);
+    fread(&library->next_id, sizeof(unsigned long), 1, fp);
+
     library->head = NULL;
-    library->count = 0;
+    file_node_t *prev = NULL;
+
+    for (int i = 0; i < library->count; ++i) {
+        file_metadata_t metadata;
+        if (fread(&metadata, sizeof(file_metadata_t), 1, fp) != 1) {
+            fclose(fp);
+            free_library(library);
+            return ERROR_LIBRARY_CORRUPT;
+        }
+
+        file_node_t *node = malloc(sizeof(file_node_t));
+        if (!node) {
+            fclose(fp);
+            free_library(library);
+            return ERROR_MEMORY_ALLOCATION;
+        }
+
+        node->data = metadata;
+        node->next = NULL;
+
+        if (!library->head)
+            library->head = node;
+        else
+            prev->next = node;
+
+        prev = node;
+    }
+
+    fclose(fp);
     library->is_modified = 0;
-    library->next_id = 1;
     return SUCCESS;
 }
 
 /*
  * Save encryption library to disk
- * [Agam Grewal]
+ * [Gordon]
  */
 int save_encryption_library(encryption_library_t *library)
 {
-    /* Minimal saver stub: nothing to do for now */
-    (void)library;
+     if (!library) return ERROR_INVALID_PATH;
+    if (!library->is_modified) return SUCCESS; 
+
+    FILE *fp = fopen(LIBRARY_FILENAME, "wb");
+    if (!fp) return ERROR_FILE_NOT_FOUND;
+
+    
+    fwrite(ENCRYPTION_SIGNATURE, sizeof(char), strlen(ENCRYPTION_SIGNATURE), fp);
+
+    
+    fwrite(&library->count, sizeof(int), 1, fp);
+    fwrite(&library->next_id, sizeof(unsigned long), 1, fp);
+
+    
+    file_node_t *cur = library->head;
+    while (cur) {
+     fwrite(&cur->data, sizeof(file_metadata_t), 1, fp);
+     cur = cur->next;
+    }
+
+    fclose(fp);
+    library->is_modified = 0;
     return SUCCESS;
 }
 
@@ -228,7 +296,17 @@ int search_library_by_name(encryption_library_t *library, const char *search_pat
  */
 int delete_encrypted_file(encryption_library_t *library, int index)
 {
-    return SUCCESS;
+    file_metadata_t* cur_file = get_library_entry(library, index);
+    if (!cur_file) {
+        return ERROR_INVALID_PATH;
+    }
+
+    int ret = remove(cur_file->original_filename);
+    if (ret != SUCCESS) {
+        return ERROR_DELETE_FAILED;
+    }
+
+    return remove_file_from_library(library, index);
 }
 
 /*
@@ -241,6 +319,26 @@ int delete_encrypted_file(encryption_library_t *library, int index)
  */
 int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
 {
+    if (!new_name) {
+        return ERROR_NEW_FILE_NAME;
+    }
+    file_metadata_t* cur_file = get_library_entry(library, index);
+    if (!cur_file) {
+        return ERROR_INVALID_PATH;
+    }
+
+    // Rename the encrypted file from disk
+    // TODO path + file need concat ?
+    int ret = rename(cur_file->original_filename, new_name);
+    if (ret != SUCCESS) {
+        return ERROR_RENAME_FAILED;
+    }
+
+    // update library metadata of this file
+    strncpy(cur_file->encrypted_filename, new_name, MAX_FILENAME_LENGTH - 1);
+    // for safety
+    cur_file->encrypted_filename[MAX_FILENAME_LENGTH - 1] = '\0';
+
     return SUCCESS;
 }
 
@@ -287,7 +385,7 @@ static int cmp_name(const void *a, const void *b)
 {
     const file_metadata_t *x = (const file_metadata_t *)a;
     const file_metadata_t *y = (const file_metadata_t *)b;
-    return strcasecmp(x->original_filename, y->original_filename);
+    return strncmp(x->original_filename, y->original_filename, MAX_FILENAME_LENGTH);
 }
 
 static int cmp_date(const void *a, const void *b)
@@ -312,7 +410,7 @@ static int cmp_type(const void *a, const void *b)
 {
     const file_metadata_t *x = (const file_metadata_t *)a;
     const file_metadata_t *y = (const file_metadata_t *)b;
-    return strcasecmp(x->file_type, y->file_type);
+    return strncmp(x->file_type, y->file_type, sizeof(x->file_type));
 }
 
 /*
@@ -406,10 +504,10 @@ int compare_metadata_entries(const file_metadata_t *a, const file_metadata_t *b,
 {
     if (!a || !b) return 0;
     switch (sort_type) {
-        case SORT_BY_NAME: return strcasecmp(a->original_filename, b->original_filename);
+    case SORT_BY_NAME: return strncmp(a->original_filename, b->original_filename, MAX_FILENAME_LENGTH);
         case SORT_BY_DATE: return (a->encryption_id < b->encryption_id) ? 1 : (a->encryption_id > b->encryption_id) ? -1 : 0;
         case SORT_BY_SIZE: return (a->original_size < b->original_size) ? 1 : (a->original_size > b->original_size) ? -1 : 0;
-        case SORT_BY_TYPE: return strcasecmp(a->file_type, b->file_type);
+    case SORT_BY_TYPE: return strncmp(a->file_type, b->file_type, sizeof(a->file_type));
         default: return 0;
     }
 }

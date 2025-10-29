@@ -43,6 +43,18 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: Failed to initialize program\n");
         return EXIT_FAILURE;
     }
+    /* Check for quick command-line modes (non-interactive) */
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--showlib") == 0) {
+            /* Print the library contents and exit without entering UI */
+            display_library_contents(&library, SORT_BY_NAME);
+            /* cleanup and exit */
+            if (cleanup_program(&library) != SUCCESS) {
+                fprintf(stderr, "Warning: Failed to properly cleanup program\n");
+            }
+            return EXIT_SUCCESS;
+        }
+    }
     
     /* Run main program loop */
     int result = main_menu_loop(&library);
