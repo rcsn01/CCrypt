@@ -126,8 +126,8 @@ int process_user_command(int choice, encryption_library_t *library)
             result = file_management_menu(library);
             break;
         case 5:
-            printf("Sort by: 1=Name, 2=Date, 3=Size, 4=Type\n");
-            sort_choice = get_user_choice("Sort option: ", 1, 4);
+            printf("Sort by: 1=Name, 2=Date, 3=Size\n");
+            sort_choice = get_user_choice("Sort option: ", 1, 3);
             display_library_contents(library, (sort_option_t)sort_choice);
             break;
         case 6:

@@ -21,7 +21,6 @@
 static int cmp_name(const void *a, const void *b);
 static int cmp_date(const void *a, const void *b);
 static int cmp_size(const void *a, const void *b);
-static int cmp_type(const void *a, const void *b);
 
 /* ========================================================================
  * LIBRARY MANAGEMENT FUNCTIONS
@@ -214,9 +213,6 @@ void display_library_contents(encryption_library_t *library, sort_option_t sort_
         case SORT_BY_SIZE:
             qsort(arr, n, sizeof(file_metadata_t), cmp_size);
             break;
-        case SORT_BY_TYPE:
-            qsort(arr, n, sizeof(file_metadata_t), cmp_type);
-            break;
         default:
             break;
     }
@@ -406,13 +402,6 @@ static int cmp_size(const void *a, const void *b)
     return 0;
 }
 
-static int cmp_type(const void *a, const void *b)
-{
-    const file_metadata_t *x = (const file_metadata_t *)a;
-    const file_metadata_t *y = (const file_metadata_t *)b;
-    return strncmp(x->file_type, y->file_type, sizeof(x->file_type));
-}
-
 /*
  * Sort library entries alphabetically by original filename
  * library Pointer to the encryption library
@@ -473,25 +462,6 @@ void sort_library_by_size(encryption_library_t *library)
 }
 
 /*
- * Sort library entries by file type/extension
- * library Pointer to the encryption library
- * [Chu-Cheng Yu]
- */
-void sort_library_by_type(encryption_library_t *library)
-{
-    if (!library || library->count <= 1) return;
-    int n = library->count;
-    file_metadata_t *arr = malloc(sizeof(file_metadata_t) * n);
-    if (!arr) return;
-    file_node_t *cur = library->head;
-    for (int i = 0; i < n && cur; ++i, cur = cur->next) arr[i] = cur->data;
-    qsort(arr, n, sizeof(file_metadata_t), cmp_type);
-    cur = library->head; int i = 0;
-    while (cur && i < n) { cur->data = arr[i++]; cur = cur->next; }
-    free(arr);
-}
-
-/*
  * Compare two metadata entries according to a sort option
  * a Pointer to first metadata entry
  * b Pointer to second metadata entry
@@ -507,7 +477,6 @@ int compare_metadata_entries(const file_metadata_t *a, const file_metadata_t *b,
     case SORT_BY_NAME: return strncmp(a->original_filename, b->original_filename, MAX_FILENAME_LENGTH);
         case SORT_BY_DATE: return (a->encryption_id < b->encryption_id) ? 1 : (a->encryption_id > b->encryption_id) ? -1 : 0;
         case SORT_BY_SIZE: return (a->original_size < b->original_size) ? 1 : (a->original_size > b->original_size) ? -1 : 0;
-    case SORT_BY_TYPE: return strncmp(a->file_type, b->file_type, sizeof(a->file_type));
         default: return 0;
     }
 }

@@ -49,8 +49,7 @@
 typedef enum {
     SORT_BY_NAME = 1,
     SORT_BY_DATE = 2,
-    SORT_BY_SIZE = 3,
-    SORT_BY_TYPE = 4
+    SORT_BY_SIZE = 3
 } sort_option_t;
 
 /* Encryption methods supported (only XOR implemented) */

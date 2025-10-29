@@ -116,12 +116,6 @@ void sort_library_by_date(encryption_library_t *library);
 void sort_library_by_size(encryption_library_t *library);
 
 /*
- * Sort library entries by file type/extension
- * library Pointer to the encryption library
- */
-void sort_library_by_type(encryption_library_t *library);
-
-/*
  * Compare two metadata entries according to a sort option
  * a Pointer to first metadata entry
  * b Pointer to second metadata entry
