@@ -244,7 +244,7 @@ int decrypt_file_workflow(encryption_library_t *library)
  * library Pointer to the encryption library instance
  * selected_index Out parameter to receive the selected index (0-based)
  * SUCCESS if a selection was made, or ERROR_FILE_NOT_FOUND if library empty
- * [Empty]
+ * [Agam Grewal]
  */
 int select_file_for_decryption(encryption_library_t *library, int *selected_index)
 {
