@@ -165,6 +165,29 @@ that can be incorporated into broader data protection frameworks without signifi
 - Compression algorithm specifications
 - Sorting and search algorithms
 
+5.2.1 Compression/Decompression Technique (Run-Length Encoding (RLE))
+The Compression Technique used for this project is Run-Length Encoding (RLE). RLE compresses sequences of repeated bytes by storing them as a (count, value) pair instead of writing the same value many times. For example, the text aaabbcc becomes the pair stream 3a 2b 2c.Since this program primarily handles TXT files,this technique is the most appropriate since it often contains repeated whitespace, line breaks.
+
+How compression works
+-The encoder scans the input left-to-right, grouping consecutive identical bytes into runs.
+-Each run is emitted as two bytes: count (int8) followed by value (int8).
+-Runs of length 1 are still stored as 1<value>; keeping the decoding phase simple and fast.
+
+Example:
+Input: Ayooooo!!!
+Scanner view (by byte): A y o o o o o ! ! !
+ Output pairs (spaces shown for readability):
+ 1'A' 1'y' 2'l' 5'o' 1' ' 3'!'
+So the in-memory pair sequence is:
+ [1]['A'][1]['y'][6]['o'][1][' '][3]['!'].
+How Decompression works 
+-The decoder reads two bytes at a time: a count and a value.
+-It writes count copies of value to the output buffer.
+-It repeats until the compressed stream is finished, reconstructing the original text exactly.
+
+
+
+
 ### 5.3 File Format Specifications
 - Encrypted file format structure
 - Library database file format
