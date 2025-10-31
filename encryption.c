@@ -367,6 +367,15 @@ int compress_data(const unsigned char *input_data, long input_size,
 {
     if (!input_data || input_size <= 0 || !output_data || !output_size)
         return ERROR_INVALID_PATH;
+
+#ifdef DEBUG
+    DEBUG_PRINT("compress_data() input_size=%ld", input_size);
+#endif
+
+    if (!input_data || input_size <= 0 || !output_data || !output_size) {
+        return ERROR_INVALID_PATH;
+    }
+
 long out_index = 0;
 long i = 0;
 
@@ -385,11 +394,19 @@ long i = 0;
         i += count;
     }
 *output_size = out_index;
-if (*output_size >= input_size) {
-    memcpy(output_data, input_data, (size_t)input_size);
-    *output_size = input_size;
-    return SUCCESS; 
+
+#ifdef DEBUG
+    DEBUG_PRINT("Compressed size: %ld", *output_size);
+#endif
+
+    if (*output_size >= input_size) {
+        memcpy(output_data, input_data, (size_t)input_size);
+        *output_size = input_size;
+#ifdef DEBUG
+        DEBUG_PRINT("Compression ineffective");
+#endif
     }
+
 }
 
 /*
@@ -448,9 +465,15 @@ int decrypt_data(const unsigned char *encrypted_data, long data_size,
 int decompress_data(const unsigned char *compressed_data, long compressed_size,
                     unsigned char *output_data, long *output_size)
 {
-    /* TODO: Implement decompression that matches compress_data (RLE or similar) */
-    if (!compressed_data || compressed_size <= 0 || !output_data || !output_size) return ERROR_INVALID_PATH;
-    /* passthrough */
+    
+    #ifdef DEBUG
+    DEBUG_PRINT("decompress_data() compressed_size=%ld", compressed_size);
+#endif
+
+    if (!compressed_data || compressed_size <= 0 || !output_data || !output_size) {
+        return ERROR_INVALID_PATH;
+    }
+    
     long out_index = 0;
     for (long i = 0; i < compressed_size; i += 2) {
         unsigned char count = compressed_data[i];
@@ -461,5 +484,11 @@ int decompress_data(const unsigned char *compressed_data, long compressed_size,
     }
 
     *output_size = out_index;
+
+#ifdef DEBUG
+    DEBUG_PRINT("Decompressed output_size=%ld", *output_size);
+#endif
+
+
     return SUCCESS;
 }
