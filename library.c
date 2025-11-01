@@ -314,7 +314,6 @@ int delete_encrypted_file(encryption_library_t *library, int index)
  * [Haoyang Che]
  */
 int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
-int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
 {
     if (!new_name) {
         return ERROR_NEW_FILE_NAME;
