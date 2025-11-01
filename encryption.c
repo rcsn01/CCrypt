@@ -111,6 +111,13 @@ FILE *fin = fopen(input_path, "rb");
     long input_size = ftell(fin);
     fseek(fin, 0, SEEK_SET);
 
+    if (input_size <= 0) {
+        printf("Error: input file size invalid (%ld)\n", input_size);
+        fclose(fin);
+        fclose(fout);
+        return ERROR_FILE_NOT_FOUND;
+    }
+
     /* Read entire file */
     unsigned char *input_data = malloc(input_size);
     if (!input_data) {
@@ -134,7 +141,7 @@ FILE *fin = fopen(input_path, "rb");
         }
         int comp_result = compress_data(input_data, input_size, compressed_data, &processed_size);
         if (comp_result != SUCCESS) {
-            printf("Error: compression failed.\n");
+            printf("Error: compression failed (code %d).\n", comp_result);
             free(input_data);
             free(compressed_data);
             fclose(fout);
@@ -217,8 +224,26 @@ int decrypt_file_workflow(encryption_library_t *library)
     }
     password[strcspn(password, "\r\n")] = 0;
 
-    /* Create output filename automatically */
-    snprintf(output_path, sizeof(output_path), "%s_dec", encrypted_path);
+    /* Create output filename: always convert trailing ".ccrypt" to ".txt".
+       If the input doesn't end with .ccrypt, append .txt. No backups. */
+    const char *enc_ext = ".ccrypt";
+    size_t enc_len = strlen(encrypted_path);
+    size_t ext_len = strlen(enc_ext);
+    if (enc_len > ext_len && strcmp(encrypted_path + enc_len - ext_len, enc_ext) == 0) {
+        /* copy base and add .txt */
+        size_t base_len = enc_len - ext_len;
+        if (base_len + 4 + 1 <= sizeof(output_path)) { /* ".txt" + NUL */
+            memcpy(output_path, encrypted_path, base_len);
+            output_path[base_len] = '\0';
+            strncat(output_path, ".txt", sizeof(output_path) - strlen(output_path) - 1);
+        } else {
+            /* unlikely: fallback to simple append */
+            snprintf(output_path, sizeof(output_path), "%s.txt", encrypted_path);
+        }
+    } else {
+        /* not a .ccrypt file: still produce a .txt output name */
+        snprintf(output_path, sizeof(output_path), "%s.txt", encrypted_path);
+    }
 
     /* Assume XOR and no compression unless metadata known */
     memset(&dummy_metadata, 0, sizeof(dummy_metadata));
@@ -368,16 +393,16 @@ int compress_data(const unsigned char *input_data, long input_size,
     if (!input_data || input_size <= 0 || !output_data || !output_size)
         return ERROR_INVALID_PATH;
 
-#ifdef DEBUG
-    DEBUG_PRINT("compress_data() input_size=%ld", input_size);
-#endif
+    #ifdef DEBUG
+        DEBUG_PRINT("compress_data() input_size=%ld", input_size);
+    #endif
 
     if (!input_data || input_size <= 0 || !output_data || !output_size) {
         return ERROR_INVALID_PATH;
     }
 
-long out_index = 0;
-long i = 0;
+    long out_index = 0;
+    long i = 0;
 
     while (i < input_size) {
         unsigned char current = input_data[i];
@@ -406,6 +431,8 @@ long i = 0;
         DEBUG_PRINT("Compression ineffective");
 #endif
     }
+
+    return SUCCESS;
 
 }
 
@@ -492,3 +519,4 @@ int decompress_data(const unsigned char *compressed_data, long compressed_size,
 
     return SUCCESS;
 }
+

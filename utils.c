@@ -24,7 +24,12 @@ int validate_file_path(const char *file_path)
     if (!file) {
         return ERROR_FILE_NOT_FOUND;
     }
+    /* Ensure file is not empty and is readable */
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
     fclose(file);
+    if (size <= 0) return ERROR_FILE_NOT_FOUND;
     return SUCCESS;
 }
 
