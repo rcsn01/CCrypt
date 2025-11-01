@@ -314,27 +314,39 @@ int delete_encrypted_file(encryption_library_t *library, int index)
  * [Haoyang Che]
  */
 int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
+int rename_encrypted_file(encryption_library_t *library, int index, const char *new_name)
 {
     if (!new_name) {
         return ERROR_NEW_FILE_NAME;
     }
     file_metadata_t* cur_file = get_library_entry(library, index);
+    printf("old file name: %s\n",cur_file->original_filename);
     if (!cur_file) {
         return ERROR_INVALID_PATH;
     }
-
+    const char* dot = strrchr(cur_file->original_filename, '.');
+    const char* slash = strrchr(cur_file->original_filename, '/');
+    int ret = 0;
+    if (dot && (!slash || dot > slash)){
+        snprintf(cur_file->encrypted_filename, sizeof(cur_file->encrypted_filename), "%s%s", new_name, dot);
+        printf("new file name: %s\n",cur_file->encrypted_filename);
+        ret = rename(cur_file->original_filename, cur_file->encrypted_filename);
+    }
+    else{
+         ret = rename(cur_file->original_filename, new_name);
+    }
     // Rename the encrypted file from disk
     // TODO path + file need concat ?
-    int ret = rename(cur_file->original_filename, new_name);
     if (ret != SUCCESS) {
+        cur_file->encrypted_filename[0] = '\0';
         return ERROR_RENAME_FAILED;
     }
-
-    // update library metadata of this file
-    strncpy(cur_file->encrypted_filename, new_name, MAX_FILENAME_LENGTH - 1);
-    // for safety
-    cur_file->encrypted_filename[MAX_FILENAME_LENGTH - 1] = '\0';
-
+    if(!dot){
+        // update library metadata of this file
+        strncpy(cur_file->encrypted_filename, new_name, MAX_FILENAME_LENGTH - 1);
+        // for safety
+        cur_file->encrypted_filename[MAX_FILENAME_LENGTH - 1] = '\0';
+    }
     return SUCCESS;
 }
 
