@@ -8,7 +8,7 @@ over the confidentiality and integrity of their information, even if the storage
 
 The tool includes password based symmetric encryption, file integrity verification, a persistent encryption library for 
 tracking files, and an interactive command line 
-interface. Users can manage encrypted files by listing, renaming, and ]deleting them, and can organise their library using 
+interface. Users can manage encrypted files by listing, renaming, and deleting them, and can organise their library using 
 different sorting options. The program is designed to be lightweight, portable, and compatible with standard C compilers, 
 with no reliance on external libraries.
 
